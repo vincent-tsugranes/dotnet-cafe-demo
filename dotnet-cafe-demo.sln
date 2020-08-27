@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.domain", "dotnet.cafe.domain\dotnet.cafe.domain.csproj", "{881FD31A-C279-4C70-92B6-EB1CBD99C7AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.core", "dotnet.cafe.core\dotnet.cafe.core.csproj", "{44BE9D05-E09B-4FB5-8F94-1E3BB60010BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.counter", "dotnet.cafe.counter\dotnet.cafe.counter.csproj", "{251CAF86-2699-4B28-A489-52C72073C2D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +14,9 @@ Global
 		{881FD31A-C279-4C70-92B6-EB1CBD99C7AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{881FD31A-C279-4C70-92B6-EB1CBD99C7AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{881FD31A-C279-4C70-92B6-EB1CBD99C7AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{44BE9D05-E09B-4FB5-8F94-1E3BB60010BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44BE9D05-E09B-4FB5-8F94-1E3BB60010BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44BE9D05-E09B-4FB5-8F94-1E3BB60010BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44BE9D05-E09B-4FB5-8F94-1E3BB60010BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{251CAF86-2699-4B28-A489-52C72073C2D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{251CAF86-2699-4B28-A489-52C72073C2D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{251CAF86-2699-4B28-A489-52C72073C2D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{251CAF86-2699-4B28-A489-52C72073C2D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
