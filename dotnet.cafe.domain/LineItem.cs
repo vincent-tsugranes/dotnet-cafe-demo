@@ -19,7 +19,7 @@ namespace dotnet.cafe.domain
 
         public override String ToString() {
             return new StringBuilder()
-                .Append("item:" + item)
+                .Append("item:" + item + "; ")
                 .Append("name:" + name)
                 .ToString();
         }       
