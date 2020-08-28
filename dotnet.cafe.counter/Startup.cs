@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +33,30 @@ namespace dotnet.cafe.counter
 
             services.AddSingleton<CafeDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<CafeDatabaseSettings>>().Value);
+
+            try
+            {
+                var kafkaSettings = Configuration.GetSection("CafeKafkaSettings");
+                var kafkaConsumerConfig = new ConsumerConfig()
+                {
+                    GroupId = kafkaSettings.GetValue<string>("GroupId"),
+                    BootstrapServers = kafkaSettings.GetValue<string>("BootstrapServers"),
+                    AutoOffsetReset = AutoOffsetReset.Earliest
+                };
+                services.AddSingleton<ConsumerConfig>(sp =>
+                    sp.GetRequiredService<IOptions<ConsumerConfig>>().Value);
+
+                var kafkaProducerConfig = new ProducerConfig()
+                {
+
+                };
+                services.AddSingleton<ProducerConfig>(sp =>
+                    sp.GetRequiredService<IOptions<ProducerConfig>>().Value);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in kafka settings: " + ex);
+            }
 
             services.AddSingleton<KafkaService>();
 

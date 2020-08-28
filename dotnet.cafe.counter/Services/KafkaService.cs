@@ -1,6 +1,9 @@
-﻿using MongoDB.Driver;
+﻿using System;
+using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Confluent.Kafka;
 using dotnet.cafe.counter.domain;
 
 namespace dotnet.cafe.counter.services
@@ -9,13 +12,42 @@ namespace dotnet.cafe.counter.services
     {
         private readonly IMongoCollection<Order> _orders;
         
-        public KafkaService(ICafeDatabaseSettings settings)
+        public KafkaService(ICafeDatabaseSettings settings, ConsumerConfig consumerConfig, ProducerConfig producerConfig)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
             _orders = database.GetCollection<Order>(settings.OrdersCollectionName);
+            
+
+            using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
+            {
+                c.Subscribe("web-in");
+                CancellationTokenSource cts = new CancellationTokenSource();
+                try
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            var cr = c.Consume();
+                            Console.WriteLine($"Consumed message '{cr.Value}' at: '{cr.TopicPartitionOffset}'.");
+                        }
+                        catch (ConsumeException e)
+                        {
+                            Console.WriteLine($"Error occured: {e.Error.Reason}");
+                        }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Ensure the consumer leaves the group cleanly and final offsets are committed.
+                    c.Close();
+                }
+            }
         }
 
+        
+        
         /*@Incoming("web-in")
         public CompletionStage<Void> onOrderIn(final Message message) {
             this.logger.debug("orderIn: {}", message.getPayload());

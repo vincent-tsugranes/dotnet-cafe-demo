@@ -19,7 +19,12 @@ create a mongodb ephemeral instance in the project
       -p MONGODB_DATABASE=cafedb \
       -p MONGODB_ADMIN_PASSWORD=redhat-20 \
       -p DATABASE_SERVICE_NAME=dotnet-cafe-mongodb-service
-  
+
+# create kafka cluster
+from the root of the dotnet-cafe-demo folder, run the create-kafka.yml script on OpenShift
+
+    oc create -f create-kafka.yml
+
 # dotnet.cafe.core
 build and deploy the dotnet.cafe.core service and dependencies
 
