@@ -1,28 +1,33 @@
 using System;
 using System.Threading.Tasks;
-using dotnet.cafe.domain;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+using Confluent.Kafka;
+using dotnet.cafe.counter.services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace dotnet.cafe.counter
 {
     public class Program
     {
+        private static IServiceProvider _serviceProvider;
         public static async Task Main(string[] args)
         {
-            IConfiguration Configuration = new ConfigurationBuilder()
+            IConfiguration configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
             
-            var cafeDatabaseSettings = new CafeDatabaseSettings(); 
-            Configuration.Bind("CafeDatabaseSettings", cafeDatabaseSettings); 
+            
+            RegisterServices(configuration);
+            
+            IServiceScope scope = _serviceProvider.CreateScope();
+            scope.ServiceProvider.GetRequiredService<KafkaService>().Run();
+            DisposeServices();
             
             //BuildWebHost(args).Run();
-            LineItem item = new LineItem(item: Item.COFFEE_BLACK,"Vince");
+            /*LineItem item = new LineItem(item: Item.COFFEE_BLACK,"Vince");
             Console.WriteLine("Initialized: " + cafeDatabaseSettings.ConnectionString);
             
             var counter = 0;
@@ -31,18 +36,20 @@ namespace dotnet.cafe.counter
             {
                 Console.WriteLine($"Counter: {++counter}");
                 await Task.Delay(1000);
-            }
+            }*/
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        /*public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .Build();
+                .Build();*/
         
-        /*private static void RegisterServices()
+        private static void RegisterServices(IConfiguration configuration)
         {
             var services = new ServiceCollection();
-            services.AddSingleton<ConsoleApplication>();            
+            services.AddSingleton<KafkaService>();
+            ConfigureServices(services, configuration);
+            
             _serviceProvider = services.BuildServiceProvider(true);
         }
         
@@ -56,6 +63,42 @@ namespace dotnet.cafe.counter
             {
                 ((IDisposable)_serviceProvider).Dispose();
             }
-        }*/
+        }
+        
+        private static void ConfigureServices(IServiceCollection services, IConfiguration configuration )
+        {
+
+
+            var cafeDatabaseSettings = new CafeDatabaseSettings(); 
+            configuration.Bind("CafeDatabaseSettings", cafeDatabaseSettings);
+            
+            services.AddSingleton<ICafeDatabaseSettings>(cafeDatabaseSettings);
+
+            try
+            {
+                var kafkaSettings = configuration.GetSection("CafeKafkaSettings");
+                var kafkaConsumerConfig = new ConsumerConfig()
+                {
+                    GroupId = kafkaSettings.GetValue<string>("GroupId"),
+                    BootstrapServers = kafkaSettings.GetValue<string>("BootstrapServers"),
+                    AutoOffsetReset = AutoOffsetReset.Earliest
+                };
+                services.AddSingleton<ConsumerConfig>(kafkaConsumerConfig);
+
+                var kafkaProducerConfig = new ProducerConfig()
+                {
+
+                };
+                services.AddSingleton<ProducerConfig>(kafkaProducerConfig);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in kafka settings: " + ex);
+            }
+
+            /*services.AddControllers()
+                .AddNewtonsoftJson(options => options.UseMemberCasing());*/
+        }
+        
     }
 }

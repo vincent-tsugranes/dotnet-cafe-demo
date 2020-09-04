@@ -11,17 +11,24 @@ namespace dotnet.cafe.counter.services
     public class KafkaService
     {
         private readonly IMongoCollection<Order> _orders;
-        
+        private MongoClient client = new MongoClient();
+        private IMongoDatabase database;
+        private ConsumerConfig _consumerConfig;
+        private ProducerConfig _producerConfig;
         public KafkaService(ICafeDatabaseSettings settings, ConsumerConfig consumerConfig, ProducerConfig producerConfig)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
+            client = new MongoClient(settings.ConnectionString);
+            database = client.GetDatabase(settings.DatabaseName);
             _orders = database.GetCollection<Order>(settings.OrdersCollectionName);
-            
+            _consumerConfig = consumerConfig;
+            _producerConfig = producerConfig;
+        }
 
-            using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
+        public void Run()
+        {
+            using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
             {
-                c.Subscribe("web-in");
+                c.Subscribe("test-topic");
                 CancellationTokenSource cts = new CancellationTokenSource();
                 try
                 {
@@ -45,8 +52,6 @@ namespace dotnet.cafe.counter.services
                 }
             }
         }
-
-        
         
         /*@Incoming("web-in")
         public CompletionStage<Void> onOrderIn(final Message message) {

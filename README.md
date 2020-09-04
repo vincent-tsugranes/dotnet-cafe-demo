@@ -26,10 +26,10 @@ from the root of the dotnet-cafe-demo folder, run the create-kafka.yml script on
     oc create -f create-kafka.yml
 
 # dotnet.cafe.core
-build and deploy the dotnet.cafe.core service and dependencies
+build and deploy the dotnet.cafe.counter service and dependencies
 
     oc new-app \
       -n dotnet-cafe-demo \
       --name=dotnet-cafe-core dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
-      --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.core/dotnet.cafe.core.csproj
+      --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.core/dotnet.cafe.counter.csproj
  
