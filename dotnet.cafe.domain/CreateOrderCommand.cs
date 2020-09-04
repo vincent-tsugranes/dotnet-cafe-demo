@@ -6,13 +6,15 @@ namespace dotnet.cafe.domain
 {
     public class CreateOrderCommand
     {
-        public String id;
+        public String id { get; set; }
 
-        public List<LineItem> beverages = new List<LineItem>();
+        public List<LineItem> beverages { get; set; }
 
-        public List<LineItem> kitchenOrders = new List<LineItem>();
+        public List<LineItem> kitchenOrders { get; set; }
 
         public CreateOrderCommand() {
+            beverages = new List<LineItem>();
+            kitchenOrders = new List<LineItem>();
         }
 
         public CreateOrderCommand(String id, List<LineItem> beverages, List<LineItem> kitchenOrders) {

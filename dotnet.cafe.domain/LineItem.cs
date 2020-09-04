@@ -5,9 +5,9 @@ namespace dotnet.cafe.domain
 {
     public class LineItem
     {
-        public Item item;
+        public Item item { get; set; }
 
-        public String name;
+        public String name { get; set; }
 
         public LineItem(Item item, String name) {
             this.item = item;

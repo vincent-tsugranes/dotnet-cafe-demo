@@ -1,25 +1,28 @@
 ﻿using System;
+using System.Collections;
 using MongoDB.Driver;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Confluent.Kafka;
 using dotnet.cafe.counter.domain;
+using dotnet.cafe.domain;
+using MongoDB.Bson;
 
 namespace dotnet.cafe.counter.services
 {
     public class KafkaService
     {
-        private readonly IMongoCollection<Order> _orders;
-        private MongoClient client = new MongoClient();
-        private IMongoDatabase database;
-        private ConsumerConfig _consumerConfig;
-        private ProducerConfig _producerConfig;
+        private readonly IMongoCollection<Order> _orderRepository;
+        private readonly ConsumerConfig _consumerConfig;
+        private readonly ProducerConfig _producerConfig;
         public KafkaService(ICafeDatabaseSettings settings, ConsumerConfig consumerConfig, ProducerConfig producerConfig)
         {
-            client = new MongoClient(settings.ConnectionString);
-            database = client.GetDatabase(settings.DatabaseName);
-            _orders = database.GetCollection<Order>(settings.OrdersCollectionName);
+            var client = new MongoClient(settings.ConnectionString);
+            var database = client.GetDatabase(settings.DatabaseName);
+            _orderRepository = database.GetCollection<Order>(settings.OrdersCollectionName);
             _consumerConfig = consumerConfig;
             _producerConfig = producerConfig;
         }
@@ -28,7 +31,7 @@ namespace dotnet.cafe.counter.services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
             {
-                c.Subscribe("test-topic");
+                c.Subscribe("web-in");
                 CancellationTokenSource cts = new CancellationTokenSource();
                 try
                 {
@@ -37,7 +40,9 @@ namespace dotnet.cafe.counter.services
                         try
                         {
                             var cr = c.Consume();
-                            Console.WriteLine($"Consumed message '{cr.Value}' at: '{cr.TopicPartitionOffset}'.");
+                            Console.WriteLine($"orderIn:'{cr.Message.Value}'");
+                            CreateOrderCommand orderCommand = JsonUtil.createOrderCommandFromJson(cr.Message.Value);
+                            handleCreateOrderCommand(orderCommand);
                         }
                         catch (ConsumeException e)
                         {
@@ -53,57 +58,68 @@ namespace dotnet.cafe.counter.services
             }
         }
         
-        /*@Incoming("web-in")
-        public CompletionStage<Void> onOrderIn(final Message message) {
-            this.logger.debug("orderIn: {}", message.getPayload());
-            return this.handleCreateOrderCommand(JsonUtil.createOrderCommandFromJson(message.getPayload().toString())).thenRun(() -> {
-                message.ack();
-            });
-        }
-
-        CompletableFuture<Void> sendBaristaOrder(final LineItemEvent event) {
-            return this.baristaOutEmitter.send(JsonUtil.toJson(event)).thenRun(() -> {
-                this.sendWebUpdate(event);
-            }).toCompletableFuture().toCompletableFuture();
-        }
-
-        CompletableFuture<Void> sendKitchenOrder(final LineItemEvent event) {
-            return this.kitchenOutEmitter.send(JsonUtil.toJson(event)).thenRun(() -> {
-                this.sendWebUpdate(event);
-            }).toCompletableFuture();
-        }
-
-        CompletableFuture<Void> sendWebUpdate(final LineItemEvent event) {
-            return this.webUpdatesOutEmitter.send(JsonUtil.toInProgressUpdate(event)).toCompletableFuture();
-        }
-
-        protected CompletionStage<Void> handleCreateOrderCommand(final CreateOrderCommand createOrderCommand) {
-            OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(createOrderCommand);
-            this.orderRepository.persist(orderCreatedEvent.order);
-            Collection<CompletableFuture<Void>> futures = new ArrayList(orderCreatedEvent.getEvents().size() * 2);
-            orderCreatedEvent.getEvents().forEach((e) -> {
-                if (e.eventType.equals(EventType.BEVERAGE_ORDER_IN)) {
-                    futures.add(this.sendBaristaOrder(e));
-                } else if (e.eventType.equals(EventType.KITCHEN_ORDER_IN)) {
-                    futures.add(this.sendKitchenOrder(e));
+        private async void sendBaristaOrder(LineItemEvent itemEvent) {
+            using (var p = new ProducerBuilder<Null, string>(_producerConfig).Build())
+            {
+                try
+                {
+                    var dr = await p.ProduceAsync("barista-out", new Message<Null, string> { Value = itemEvent.ToJson() });
+                    sendWebUpdate(itemEvent);
+                    Console.WriteLine($"Sending Order to Barista '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
-
-            });
-            return CompletableFuture.allOf((CompletableFuture[])futures.toArray((x$0) -> {
-                return new CompletableFuture[x$0];
-            })).exceptionally((e) -> {
-                this.logger.error(e.getMessage());
-                return null;
-            });
+                catch (ProduceException<Null, string> e)
+                {
+                    Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+                }
+            }
         }
 
-        @Incoming("orders-up")
-        @Outgoing("web-updates-order-up")
-        public String onOrderUp(String payload) {
-            this.logger.debug("received order up {}", payload);
-            return JsonUtil.toDashboardUpdateReadyJson(payload);
-        }*/
+        private async void sendKitchenOrder(LineItemEvent itemEvent) {
+            using (var p = new ProducerBuilder<Null, string>(_producerConfig).Build())
+            {
+                try
+                {
+                    var dr = await p.ProduceAsync("kitchen-out", new Message<Null, string> { Value = itemEvent.ToJson() });
+                    sendWebUpdate(itemEvent);
+                    Console.WriteLine($"Sending Order to Kitchen '{dr.Value}' to '{dr.TopicPartitionOffset}'");
+                }
+                catch (ProduceException<Null, string> e)
+                {
+                    Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+                }
+            }
+        }
         
+        private async void sendWebUpdate(LineItemEvent itemEvent) {
+            using (var p = new ProducerBuilder<Null, string>(_producerConfig).Build())
+            {
+                try
+                {
+                    var dr = await p.ProduceAsync("web-updates-out", new Message<Null, string> { Value = itemEvent.ToJson() });
+                    Console.WriteLine($"Sending Order to Web '{dr.Value}' to '{dr.TopicPartitionOffset}'");
+                }
+                catch (ProduceException<Null, string> e)
+                {
+                    Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+                }
+            }
+        }
+        
+        private async void handleCreateOrderCommand(CreateOrderCommand createOrderCommand) {
+            OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(createOrderCommand);
+            await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
+            orderCreatedEvent.getEvents().ForEach(e =>
+            {
+                if (e.eventType == EventType.BEVERAGE_ORDER_IN)
+                {
+                    sendBaristaOrder(e);
+                }else if (e.eventType == EventType.KITCHEN_ORDER_IN)
+                {
+                    sendKitchenOrder(e);
+                }
+            }); 
+        }
+
     }
 }
 
