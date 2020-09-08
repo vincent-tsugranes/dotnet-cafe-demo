@@ -39,7 +39,7 @@ namespace dotnet.cafe.counter.services
                     {
                         try
                         {
-                            var cr = c.Consume();
+                            var cr = c.Consume(cts.Token);
                             Console.WriteLine($"orderIn:'{cr.Message.Value}'");
                             CreateOrderCommand orderCommand = JsonUtil.createOrderCommandFromJson(cr.Message.Value);
                             handleCreateOrderCommand(orderCommand);

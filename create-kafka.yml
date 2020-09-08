@@ -6,6 +6,7 @@ metadata:
 spec:
   kafka:
     config:
+      auto.create.topics.enable: "true"
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
