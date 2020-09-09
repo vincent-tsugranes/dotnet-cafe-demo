@@ -15,16 +15,44 @@ namespace dotnet.cafe.counter.services
 {
     public class KafkaService
     {
+        public CancellationTokenSource cts = new CancellationTokenSource();
+        
         private readonly IMongoCollection<Order> _orderRepository;
         private readonly ConsumerConfig _consumerConfig;
         private readonly ProducerConfig _producerConfig;
-        public KafkaService(ICafeDatabaseSettings settings, ConsumerConfig consumerConfig, ProducerConfig producerConfig)
+        public KafkaService(CafeDatabaseSettings cafeDatabaseSettings, CafeKafkaSettings cafeKafkaSettings)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var database = client.GetDatabase(settings.DatabaseName);
-            _orderRepository = database.GetCollection<Order>(settings.OrdersCollectionName);
-            _consumerConfig = consumerConfig;
-            _producerConfig = producerConfig;
+            
+            try
+            {
+                _consumerConfig = new ConsumerConfig()
+                {
+                    GroupId = cafeKafkaSettings.GroupId,
+                    BootstrapServers = cafeKafkaSettings.BootstrapServers,
+                    AutoOffsetReset = AutoOffsetReset.Earliest
+                };
+
+                _producerConfig = new ProducerConfig()
+                {
+                    BootstrapServers = cafeKafkaSettings.BootstrapServers
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in kafka settings: " + ex);
+            }
+
+            try
+            {
+                var client = new MongoClient(cafeDatabaseSettings.ConnectionString);
+                var database = client.GetDatabase(cafeDatabaseSettings.DatabaseName);
+                _orderRepository = database.GetCollection<Order>(cafeDatabaseSettings.OrdersCollectionName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception in mongodb settings: " + ex);
+            }
+            
         }
 
         public void Run()
@@ -32,7 +60,7 @@ namespace dotnet.cafe.counter.services
             using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
             {
                 c.Subscribe("web-in");
-                CancellationTokenSource cts = new CancellationTokenSource();
+                
                 try
                 {
                     while (true)
