@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderGenerator", "OrderGene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.kitchen", "dotnet.cafe.kitchen\dotnet.cafe.kitchen.csproj", "{231BDE2D-AA5F-45E2-B344-A75C687CC984}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.web", "dotnet.cafe.web\dotnet.cafe.web.csproj", "{602370D9-B603-46F4-9592-17A88A547CCD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{231BDE2D-AA5F-45E2-B344-A75C687CC984}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{231BDE2D-AA5F-45E2-B344-A75C687CC984}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{231BDE2D-AA5F-45E2-B344-A75C687CC984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{602370D9-B603-46F4-9592-17A88A547CCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{602370D9-B603-46F4-9592-17A88A547CCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{602370D9-B603-46F4-9592-17A88A547CCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{602370D9-B603-46F4-9592-17A88A547CCD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

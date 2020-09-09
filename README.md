@@ -25,11 +25,17 @@ from the root of the dotnet-cafe-demo folder, run the create-kafka.yml script on
 
     oc create -f create-kafka.yml
 
-# dotnet.cafe.core
-build and deploy the dotnet.cafe.counter service and dependencies
+# dotnet.cafe.kitchen
+build and deploy the dotnet.cafe.kitchen service and dependencies
+
+set the environment variables for your OCP services
+DOTNET_CAFE_MONGODB
+DOTNET_CAFE_KAFKA_BOOTSTRAP
 
     oc new-app \
       -n dotnet-cafe-demo \
-      --name=dotnet-cafe-core dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
-      --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.core/dotnet.cafe.counter.csproj
+      --name=dotnet-cafe-kitchen dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
+      --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.kitchen/dotnet.cafe.kitchen.csproj \
+      -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-route-dotnet-cafe-demo.apps.ocp.nonperson.net:27017 \
+      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=dotnet-cafe-kafka-bootstrap-dotnet-cafe-demo.apps.ocp.nonperson.net:9092
  

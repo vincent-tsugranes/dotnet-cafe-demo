@@ -17,13 +17,14 @@ namespace dotnet.cafe.kitchen.Services
         public KafkaService(CafeKafkaSettings cafeKafkaSettings)
         {
             _kitchen = new Kitchen();
-                        try
+            try
             {
                 _consumerConfig = new ConsumerConfig()
                 {
                     GroupId = cafeKafkaSettings.GroupId,
                     BootstrapServers = cafeKafkaSettings.BootstrapServers,
-                    AutoOffsetReset = AutoOffsetReset.Earliest
+                    AutoOffsetReset = AutoOffsetReset.Earliest,
+                    AllowAutoCreateTopics = true
                 };
 
                 _producerConfig = new ProducerConfig()

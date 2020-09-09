@@ -29,7 +29,8 @@ namespace dotnet.cafe.counter.services
                 {
                     GroupId = cafeKafkaSettings.GroupId,
                     BootstrapServers = cafeKafkaSettings.BootstrapServers,
-                    AutoOffsetReset = AutoOffsetReset.Earliest
+                    AutoOffsetReset = AutoOffsetReset.Earliest,
+                    AllowAutoCreateTopics = true
                 };
 
                 _producerConfig = new ProducerConfig()
@@ -135,7 +136,7 @@ namespace dotnet.cafe.counter.services
         
         private async void handleCreateOrderCommand(CreateOrderCommand createOrderCommand) {
             OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(createOrderCommand);
-            await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
+            //await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
             orderCreatedEvent.getEvents().ForEach(e =>
             {
                 if (e.eventType == EventType.BEVERAGE_ORDER_IN)
