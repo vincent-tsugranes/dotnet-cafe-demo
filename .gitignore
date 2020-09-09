@@ -12,3 +12,5 @@
 # Editor-based HTTP Client requests
 /httpRequests/
 /.idea/
+/obj/
+/bin/Debug/
