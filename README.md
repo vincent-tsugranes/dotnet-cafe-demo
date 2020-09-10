@@ -36,6 +36,35 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
       -n dotnet-cafe-demo \
       --name=dotnet-cafe-kitchen dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
       --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.kitchen/dotnet.cafe.kitchen.csproj \
-      -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-route-dotnet-cafe-demo.apps.ocp.nonperson.net:27017 \
-      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=dotnet-cafe-kafka-bootstrap-dotnet-cafe-demo.apps.ocp.nonperson.net:9092
+      -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
+      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092
  
+
+# dotnet.cafe.barista
+
+    oc new-app \
+      -n dotnet-cafe-demo \
+      --name=dotnet-cafe-barista dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
+      --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.barista/dotnet.cafe.barista.csproj \
+      -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
+      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092
+      
+  
+ # dotnet.cafe.counter 
+ 
+     oc new-app \
+       -n dotnet-cafe-demo \
+       --name=dotnet-cafe-counter dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
+       --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.counter/dotnet.cafe.counter.csproj \
+       -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
+       -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092
+       
+       
+  # dotnet.cafe.web 
+  
+      oc new-app \
+        -n dotnet-cafe-demo \
+        --name=dotnet-cafe-web dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
+        --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.web/dotnet.cafe.web.csproj \
+        -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
+        -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092

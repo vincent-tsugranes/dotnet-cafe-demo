@@ -19,7 +19,7 @@ namespace dotnet.cafe.kitchen
             String kafkaBootstrap = Environment.GetEnvironmentVariable("DOTNET_CAFE_KAFKA_BOOTSTRAP") ?? "127.0.0.1:9099";
             //String mongoDB = Environment.GetEnvironmentVariable("DOTNET_CAFE_MONGODB") ?? "mongodb://127.0.0.1:27017";
 
-            KafkaService kafkaService = new KafkaService(new CafeKafkaSettings(kafkaBootstrap));
+            KitchenKafkaService kafkaService = new KitchenKafkaService(new CafeKafkaSettings(kafkaBootstrap));
             await Task.Factory.StartNew(kafkaService.Run);
             
             Console.WriteLine("Press Ctrl + C to cancel");

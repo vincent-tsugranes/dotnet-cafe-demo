@@ -10,14 +10,14 @@ using dotnet.cafe.domain;
 
 namespace dotnet.cafe.counter.services
 {
-    public class KafkaService
+    public class CounterKafkaService
     {
         public CancellationTokenSource cts = new CancellationTokenSource();
         
         private readonly IMongoCollection<Order> _orderRepository;
         private readonly ConsumerConfig _consumerConfig;
         private readonly ProducerConfig _producerConfig;
-        public KafkaService(CafeDatabaseSettings cafeDatabaseSettings, CafeKafkaSettings cafeKafkaSettings)
+        public CounterKafkaService(CafeDatabaseSettings cafeDatabaseSettings, CafeKafkaSettings cafeKafkaSettings)
         {
             
             try
@@ -34,6 +34,8 @@ namespace dotnet.cafe.counter.services
                 {
                     BootstrapServers = cafeKafkaSettings.BootstrapServers
                 };
+                
+                Console.WriteLine("Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
             }
             catch (Exception ex)
             {
@@ -45,6 +47,10 @@ namespace dotnet.cafe.counter.services
                 var client = new MongoClient(cafeDatabaseSettings.ConnectionString);
                 var database = client.GetDatabase(cafeDatabaseSettings.DatabaseName);
                 _orderRepository = database.GetCollection<Order>(cafeDatabaseSettings.OrdersCollectionName);
+                
+                Console.WriteLine("Read MongoDB Connection String: " + cafeDatabaseSettings.ConnectionString);
+                Console.WriteLine("Read MongoDB DB Name: " + cafeDatabaseSettings.DatabaseName);
+                Console.WriteLine("Read MongoDB Collection Name: " + cafeDatabaseSettings.OrdersCollectionName);
             }
             catch (Exception ex)
             {
@@ -57,8 +63,9 @@ namespace dotnet.cafe.counter.services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
             {
-                c.Subscribe("web-in");
-                
+                string topicName = "web-in";
+                c.Subscribe(topicName);
+                Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
                 try
                 {
                     while (true)

@@ -8,13 +8,13 @@ using dotnet.cafe.kitchen.Domain;
 
 namespace dotnet.cafe.kitchen.Services
 {
-    public class KafkaService
+    public class KitchenKafkaService
     {
         private readonly ConsumerConfig _consumerConfig;
         private readonly ProducerConfig _producerConfig;
         private readonly Kitchen _kitchen;
         
-        public KafkaService(CafeKafkaSettings cafeKafkaSettings)
+        public KitchenKafkaService(CafeKafkaSettings cafeKafkaSettings)
         {
             _kitchen = new Kitchen();
             try
@@ -31,6 +31,8 @@ namespace dotnet.cafe.kitchen.Services
                 {
                     BootstrapServers = cafeKafkaSettings.BootstrapServers
                 };
+                
+                Console.WriteLine("Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
             }
             catch (Exception ex)
             {
@@ -42,7 +44,10 @@ namespace dotnet.cafe.kitchen.Services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
             {
-                c.Subscribe("orders-in");
+                string topicName = "orders-in";
+                c.Subscribe(topicName);
+                Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
+                
                 CancellationTokenSource cts = new CancellationTokenSource();
                 try
                 {

@@ -31,6 +31,8 @@ namespace dotnet.cafe.barista.Services
                 {
                     BootstrapServers = cafeKafkaSettings.BootstrapServers
                 };
+                
+                Console.WriteLine("Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
             }
             catch (Exception ex)
             {
@@ -42,7 +44,10 @@ namespace dotnet.cafe.barista.Services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
             {
-                c.Subscribe("orders-in");
+                string topicName = "orders-in";
+                c.Subscribe(topicName);
+                Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
+                
                 CancellationTokenSource cts = new CancellationTokenSource();
                 try
                 {

@@ -18,7 +18,7 @@ namespace dotnet.cafe.counter
             String kafkaBootstrap = Environment.GetEnvironmentVariable("DOTNET_CAFE_KAFKA_BOOTSTRAP") ?? "127.0.0.1:9099";
             String mongoDB = Environment.GetEnvironmentVariable("DOTNET_CAFE_MONGODB") ?? "mongodb://127.0.0.1:27017";
 
-            KafkaService kafkaService = new KafkaService(new CafeDatabaseSettings(mongoDB), new CafeKafkaSettings(kafkaBootstrap));
+            CounterKafkaService kafkaService = new CounterKafkaService(new CafeDatabaseSettings(mongoDB), new CafeKafkaSettings(kafkaBootstrap));
             await Task.Factory.StartNew(kafkaService.Run);
             
             Console.WriteLine("Press Ctrl + C to cancel");
