@@ -4,11 +4,11 @@ namespace dotnet.cafe.domain
 {
     public abstract class WebUpdate
     {   
-        public String orderId;
-        public String itemId;
-        public String name;
-        public Item item;
-        public OrderStatus status;
+        public String orderId { get; set; }
+        public String itemId { get; set; }
+        public String name { get; set; }
+        public Item item { get; set; }
+        public OrderStatus status { get; set; }
 
         public WebUpdate() {
         }

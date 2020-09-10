@@ -4,11 +4,11 @@ namespace dotnet.cafe.domain
 {
     public class LineItemEvent
     {
-        public String itemId;
-        public String orderId;
-        public EventType eventType;
-        public String name;
-        public Item item;
+        public String itemId { get; set; }
+        public String orderId { get; set; }
+        public EventType eventType { get; set; }
+        public String name { get; set; }
+        public Item item { get; set; }
 
         public LineItemEvent() {
         }

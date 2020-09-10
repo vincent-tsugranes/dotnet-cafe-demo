@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using dotnet.cafe.domain;
+using dotnet.cafe.web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,10 +48,7 @@ namespace dotnet.cafe.web.Controllers
                             {
                                 var cr = c.Consume(cancellationToken);
                                 var messageValue = cr.Message.Value;
-                                Console.WriteLine($"enqueued order:'{messageValue}'");
                                 queue.Enqueue(messageValue);
-                                /*await response.WriteAsync(messageValue);
-                                await response.Body.FlushAsync();*/
                             }
                             catch (ConsumeException e)
                             {
@@ -67,16 +65,17 @@ namespace dotnet.cafe.web.Controllers
                 
                 for(var i = 0; true; ++i)
                 {
-                    //queue.Enqueue($"data: Controller {i} at {DateTime.Now}\r\r");
                     String message;
                     while (queue.TryDequeue(out message))
                     {
-                        Console.WriteLine($"dequeued order:'{message}'");
-                        await response.WriteAsync($"data: Message {message} at {DateTime.Now}\r\r", cancellationToken: cancellationToken);                        
+                        LineItemEvent item = JsonSerializer.Deserialize<LineItemEvent>(message);
+                        DashboardUpdate dashboardUpdate = new DashboardUpdate(item);
+                        
+                        await response.WriteAsync($"data: Message {dashboardUpdate.ToString()} at {DateTime.Now}\r\r", cancellationToken: cancellationToken);                        
                     }
 
                     await response.Body.FlushAsync(cancellationToken);
-                    await Task.Delay(5 * 1000);
+                    await Task.Delay(1 * 1000);
                 }
             }            
 

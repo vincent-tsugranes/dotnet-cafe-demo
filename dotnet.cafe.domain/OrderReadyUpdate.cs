@@ -5,7 +5,7 @@ namespace dotnet.cafe.domain
 {
     public class OrderReadyUpdate : WebUpdate
     {
-        public String madeBy;
+        public String madeBy { get; set; }
 
         public OrderReadyUpdate() {
         }

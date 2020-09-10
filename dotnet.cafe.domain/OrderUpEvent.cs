@@ -4,7 +4,7 @@ namespace dotnet.cafe.domain
 {
     public class OrderUpEvent : LineItemEvent
     {
-        public String madeBy;
+        public String madeBy { get; set; }
 
         public OrderUpEvent() {
         }

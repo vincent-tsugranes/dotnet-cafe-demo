@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Text.Json;
 using MongoDB.Driver;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using dotnet.cafe.counter.domain;
 using dotnet.cafe.domain;
-using MongoDB.Bson;
 
 namespace dotnet.cafe.counter.services
 {
@@ -92,7 +89,7 @@ namespace dotnet.cafe.counter.services
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("barista-out", new Message<Null, string> { Value = itemEvent.ToJson() });
+                    var dr = await p.ProduceAsync("barista-out", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
                     sendWebUpdate(itemEvent);
                     Console.WriteLine($"Sending Order to Barista '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
@@ -108,7 +105,7 @@ namespace dotnet.cafe.counter.services
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("kitchen-out", new Message<Null, string> { Value = itemEvent.ToJson() });
+                    var dr = await p.ProduceAsync("kitchen-out", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
                     sendWebUpdate(itemEvent);
                     Console.WriteLine($"Sending Order to Kitchen '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
@@ -124,7 +121,8 @@ namespace dotnet.cafe.counter.services
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("web-updates-out", new Message<Null, string> { Value = itemEvent.ToJson() });
+                    string itemString = JsonSerializer.Serialize(itemEvent);
+                    var dr = await p.ProduceAsync("web-updates-out", new Message<Null, string> { Value = itemString });
                     Console.WriteLine($"Sending Order to Web '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)
