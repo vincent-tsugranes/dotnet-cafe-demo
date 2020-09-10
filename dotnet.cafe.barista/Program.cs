@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Confluent.Kafka;
+using dotnet.cafe.barista.Services;
 using dotnet.cafe.domain;
-using dotnet.cafe.kitchen.Services;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace dotnet.cafe.kitchen
+namespace dotnet.cafe.barista
 {
     class Program
     {
-
         private static readonly AutoResetEvent _closingEvent = new AutoResetEvent(false);
-        
+
         static async Task Main(string[] args)
         {
             String kafkaBootstrap = Environment.GetEnvironmentVariable("DOTNET_CAFE_KAFKA_BOOTSTRAP") ?? "127.0.0.1:9099";
-            //String mongoDB = Environment.GetEnvironmentVariable("DOTNET_CAFE_MONGODB") ?? "mongodb://127.0.0.1:27017";
-
-            KafkaService kafkaService = new KafkaService(new CafeKafkaSettings(kafkaBootstrap));
+            
+            BaristaKafkaService kafkaService = new BaristaKafkaService(new CafeKafkaSettings(kafkaBootstrap));
             await Task.Factory.StartNew(kafkaService.Run);
             
             Console.WriteLine("Press Ctrl + C to cancel");
@@ -31,7 +26,6 @@ namespace dotnet.cafe.kitchen
  
             _closingEvent.WaitOne();
         }
-        
         
     }
 }

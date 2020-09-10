@@ -134,7 +134,7 @@ namespace dotnet.cafe.counter.services
         
         private async void handleCreateOrderCommand(CreateOrderCommand createOrderCommand) {
             OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(createOrderCommand);
-            //await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
+            await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
             orderCreatedEvent.getEvents().ForEach(e =>
             {
                 if (e.eventType == EventType.BEVERAGE_ORDER_IN)

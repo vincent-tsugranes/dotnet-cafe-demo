@@ -21,10 +21,10 @@ namespace dotnet.cafe.counter
             KafkaService kafkaService = new KafkaService(new CafeDatabaseSettings(mongoDB), new CafeKafkaSettings(kafkaBootstrap));
             await Task.Factory.StartNew(kafkaService.Run);
             
-            Console.WriteLine("Press Ctrl + C to cancel!");
+            Console.WriteLine("Press Ctrl + C to cancel");
             Console.CancelKeyPress += ((s, a) =>
             {
-                Console.WriteLine("Bye!");
+                Console.WriteLine("Exiting");
                 _closingEvent.Set();
             });
  
