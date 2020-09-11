@@ -49,6 +49,7 @@ namespace dotnet.cafe.kitchen.Services
                 Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
                 
                 CancellationTokenSource cts = new CancellationTokenSource();
+                
                 try
                 {
                     while (true)

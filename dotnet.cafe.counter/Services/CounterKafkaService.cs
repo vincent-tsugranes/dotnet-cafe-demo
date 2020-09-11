@@ -12,8 +12,6 @@ namespace dotnet.cafe.counter.services
 {
     public class CounterKafkaService
     {
-        public CancellationTokenSource cts = new CancellationTokenSource();
-        
         private readonly IMongoCollection<Order> _orderRepository;
         private readonly ConsumerConfig _consumerConfig;
         private readonly ProducerConfig _producerConfig;
@@ -66,6 +64,9 @@ namespace dotnet.cafe.counter.services
                 string topicName = "web-in";
                 c.Subscribe(topicName);
                 Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
+                
+                CancellationTokenSource cts = new CancellationTokenSource();
+                
                 try
                 {
                     while (true)

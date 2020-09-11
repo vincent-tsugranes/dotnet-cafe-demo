@@ -6,11 +6,11 @@ namespace dotnet.cafe.domain
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
 
-        public CafeDatabaseSettings(string connectionString)
+        public CafeDatabaseSettings(string connectionString, string databaseName = "OrdersDB", string ordersCollectionName = "Orders")
         {
             this.ConnectionString = connectionString;
-            this.DatabaseName = "OrdersDb";
-            this.OrdersCollectionName = "Orders";
+            this.DatabaseName = databaseName;
+            this.OrdersCollectionName = ordersCollectionName;
         }
     }
 }

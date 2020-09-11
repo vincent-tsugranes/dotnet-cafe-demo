@@ -36,8 +36,8 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
       -n dotnet-cafe-demo \
       --name=dotnet-cafe-kitchen dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
       --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.kitchen/dotnet.cafe.kitchen.csproj \
-      -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
-      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092
+      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092 \
+      -l app=dotnet-cafe-module
  
 
 # dotnet.cafe.barista
@@ -46,8 +46,8 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
       -n dotnet-cafe-demo \
       --name=dotnet-cafe-barista dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
       --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.barista/dotnet.cafe.barista.csproj \
-      -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
-      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092
+      -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092 \
+      -l app=dotnet-cafe-module
       
   
  # dotnet.cafe.counter 
@@ -56,8 +56,9 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
        -n dotnet-cafe-demo \
        --name=dotnet-cafe-counter dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
        --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.counter/dotnet.cafe.counter.csproj \
-       -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
-       -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092
+       -e DOTNET_CAFE_MONGODB=mongodb://cafe-user:redhat-20@dotnet-cafe-mongodb-service:27017 \
+       -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092 \
+       -l app=dotnet-cafe-module
        
        
   # dotnet.cafe.web 
@@ -66,5 +67,27 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
         -n dotnet-cafe-demo \
         --name=dotnet-cafe-web dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
         --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.web/dotnet.cafe.web.csproj \
-        -e DOTNET_CAFE_MONGODB=mongodb://dotnet-cafe-mongodb-service:27017 \
-        -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092
+        -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092 \
+        -l app=dotnet-cafe-module
+  
+  
+  Expose a route to the site
+        
+        oc expose svc/dotnet-cafe-web
+  
+  Browse the site at
+  
+        http://dotnet-cafe-web-dotnet-cafe-demo.apps.OPENSHIFT_DOMAIN/
+        
+  #OrderGenerator
+  
+      oc new-app \
+          -n dotnet-cafe-demo \
+          --name=dotnet-cafe-web dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
+          --build-env DOTNET_STARTUP_PROJECT=OrderGenerator/OrderGenerator.csproj \
+          -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092 \
+          -l app=dotnet-cafe-module
+          
+  #Add annotations for pretty topology display
+      oc annotate deployment -l app=dotnet-cafe-module app.openshift.io/connects-to='["cafe-cluster-kafka",{"apiVersion":"apps/v1","kind":"StatefulSet","name":"cafe-cluster-kafka"}]'
+      oc annotate deployment dotnet-cafe-counter app.openshift.io/connects-to='["cafe-cluster-kafka",{"apiVersion":"apps/v1","kind":"StatefulSet","name":"cafe-cluster-kafka"},{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"dotnet-cafe-mongodb-service"}]' --overwrite
