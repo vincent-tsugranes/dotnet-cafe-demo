@@ -82,10 +82,11 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
         http://dotnet-cafe-web-dotnet-cafe-demo.apps.OPENSHIFT_DOMAIN/
                   
   #Add annotations for pretty topology display
-  
+  <img src="https://github.com/vincent-tsugranes/dotnet-cafe-demo/blob/master/support/images/dotnet-cafe-topology.png?raw=true"></img>
+   
       oc annotate deployment -l app=dotnet-cafe-module app.openshift.io/connects-to='["cafe-cluster-kafka",{"apiVersion":"apps/v1","kind":"StatefulSet","name":"cafe-cluster-kafka"}]'
       oc annotate deployment dotnet-cafe-counter app.openshift.io/connects-to='["cafe-cluster-kafka",{"apiVersion":"apps/v1","kind":"StatefulSet","name":"cafe-cluster-kafka"},{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"dotnet-cafe-mongodb-service"}]' --overwrite
       oc label dc dotnet-cafe-mongodb-service app.kubernetes.io/name=mongodb
       oc label deployment -l app=dotnet-cafe-module app.kubernetes.io/name=dotnet
       
-      
+   
