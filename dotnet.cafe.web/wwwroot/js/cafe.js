@@ -189,29 +189,44 @@ function uuidv4() {
     });
 }
 
-//    </script>
 
-//  <script>
 // Status Board
+function cafeInitialize() {
 
-/*$(function () {
-    /!*          var source = new EventSource("http://quarkus-cafe-web-quarkus-cafe.apps.cluster-virtual-1b57.virtual-1b57.sandbox1482.opentlc.com/dashboard/stream"); *!/
-//    var source = new EventSource("http://localhost:8080/dashboard/stream");
-    var source = new EventSource("{sourceUrl}");
-    source.onmessage = function(e) {
-        console.log(e);
-        var state = JSON.parse(e.data);
-        if(state.status=="IN_QUEUE")
-            $("tbody").append(line(state));
-        if(state.status=="READY"){
-            console.log(state);
+    if (window.EventSource === undefined) {
+        // If not supported  
+        console.log("Your browser doesn't support Server Sent Events.")
+
+    } else {
+        var source = new EventSource('/api/sse');
+
+        source.onmessage = function (event) {
+            console.log('onmessage: ' + event.data);
+            var state = JSON.parse(event.data);
+            if(state.status==="IN_QUEUE")
+                $("tbody").append(line(state));
+            if(state.status==="READY") {
+                console.log(state);
 //              $("#"+state.itemId).replaceWith(line(state));
 //              setTimeout(cleanup(state.itemId), 15000);
-            display(state);
-        }
+                display(state);
+            }
+        };
 
-    };
-});*/
+        source.onopen = function (event) {
+            console.log('Connection Open');
+        };
+
+        source.onerror = function (event) {
+            if (event.eventPhase === EventSource.CLOSED) {
+                console.log('Connection Closed');
+            }else{
+                console.log('Connection Error: ' + event);
+            }
+        }
+    }
+
+}
 
 function display(state){
     let count = (Math.floor(Math.random() * 15) * 1000) + 5000;
