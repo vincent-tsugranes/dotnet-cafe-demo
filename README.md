@@ -21,6 +21,8 @@ create a mongodb ephemeral instance in the project
       -p DATABASE_SERVICE_NAME=dotnet-cafe-mongodb-service
 
 # create kafka cluster
+This requires that the "Red Hat Integration - AMQ Streams" operator be installed on the cluster.
+
 from the root of the dotnet-cafe-demo folder, run the create-kafka.yml script on OpenShift
 
     oc create -f create-kafka.yml
@@ -29,7 +31,6 @@ from the root of the dotnet-cafe-demo folder, run the create-kafka.yml script on
 build and deploy the dotnet.cafe.kitchen service and dependencies
 
 set the environment variables for your OCP services
-DOTNET_CAFE_MONGODB
 DOTNET_CAFE_KAFKA_BOOTSTRAP
 
     oc new-app \
@@ -51,6 +52,7 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
       
   
  # dotnet.cafe.counter 
+ Set the DOTNET_CAFE_MONGODB environment variable as well
  
      oc new-app \
        -n dotnet-cafe-demo \
@@ -78,16 +80,12 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
   Browse the site at
   
         http://dotnet-cafe-web-dotnet-cafe-demo.apps.OPENSHIFT_DOMAIN/
-        
-  #OrderGenerator
-  
-      oc new-app \
-          -n dotnet-cafe-demo \
-          --name=dotnet-cafe-web dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
-          --build-env DOTNET_STARTUP_PROJECT=OrderGenerator/OrderGenerator.csproj \
-          -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092 \
-          -l app=dotnet-cafe-module
-          
+                  
   #Add annotations for pretty topology display
+  
       oc annotate deployment -l app=dotnet-cafe-module app.openshift.io/connects-to='["cafe-cluster-kafka",{"apiVersion":"apps/v1","kind":"StatefulSet","name":"cafe-cluster-kafka"}]'
       oc annotate deployment dotnet-cafe-counter app.openshift.io/connects-to='["cafe-cluster-kafka",{"apiVersion":"apps/v1","kind":"StatefulSet","name":"cafe-cluster-kafka"},{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"dotnet-cafe-mongodb-service"}]' --overwrite
+      oc label dc dotnet-cafe-mongodb-service app.kubernetes.io/name=mongodb
+      oc label deployment -l app=dotnet-cafe-module app.kubernetes.io/name=dotnet
+      
+      
