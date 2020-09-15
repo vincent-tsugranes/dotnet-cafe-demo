@@ -98,7 +98,7 @@ namespace dotnet.cafe.counter.services
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("barista-out", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
+                    var dr = await p.ProduceAsync("orders-in", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
                     sendWebUpdate(itemEvent);
                     Console.WriteLine($"Sending Order to Barista '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
@@ -114,7 +114,7 @@ namespace dotnet.cafe.counter.services
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("kitchen-out", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
+                    var dr = await p.ProduceAsync("orders-in", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
                     sendWebUpdate(itemEvent);
                     Console.WriteLine($"Sending Order to Kitchen '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
@@ -143,7 +143,7 @@ namespace dotnet.cafe.counter.services
         
         private async void handleCreateOrderCommand(CreateOrderCommand createOrderCommand) {
             OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(createOrderCommand);
-            await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
+            //await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
             orderCreatedEvent.getEvents().ForEach(e =>
             {
                 if (e.eventType == EventType.BEVERAGE_ORDER_IN)

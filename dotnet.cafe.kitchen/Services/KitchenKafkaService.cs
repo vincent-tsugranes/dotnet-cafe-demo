@@ -91,7 +91,7 @@ namespace dotnet.cafe.kitchen.Services
             {
                 try
                 {   
-                    var dr = await p.ProduceAsync("web-in", new Message<Null, string> { Value=json });
+                    var dr = await p.ProduceAsync("orders-out", new Message<Null, string> { Value=json });
                     Console.WriteLine($"Delivered '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)

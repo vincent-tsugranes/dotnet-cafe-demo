@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
@@ -41,7 +42,7 @@ namespace dotnet.cafe.web.Controllers
             using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
                 c.Subscribe("web-updates-out");
-                await Task.Run(() =>
+                Task.Run(() =>
                 {
                     try
                     {
@@ -51,6 +52,7 @@ namespace dotnet.cafe.web.Controllers
                             {
                                 var cr = c.Consume(cancellationToken);
                                 var messageValue = cr.Message.Value;
+                                Console.WriteLine("Received message on web-updates-out: " + messageValue);
                                 queue.Enqueue(messageValue);
                             }
                             catch (ConsumeException e)
@@ -66,20 +68,29 @@ namespace dotnet.cafe.web.Controllers
                     }
                 });
                 
+                await response.Body.FlushAsync();
+                
                 for(var i = 0; true; ++i)
                 {
                     while (queue.TryDequeue(out var message))
                     {
                         LineItemEvent item = JsonSerializer.Deserialize<LineItemEvent>(message);
                         DashboardUpdate dashboardUpdate = new DashboardUpdate(item);
-                        
-                        await response.WriteAsync($"data: Message {dashboardUpdate.ToString()} at {DateTime.Now}\n\n");                        
+
+                        var serializerOptions = new JsonSerializerOptions
+                        {
+                            Converters = {new JsonStringEnumConverter()},
+                            IgnoreNullValues = true
+                        };
+                    
+                        String dashboardUpdateJson = JsonSerializer.Serialize(dashboardUpdate, serializerOptions);
+                        await response.WriteAsync($"data:{dashboardUpdateJson} \n\n");
+                        await response.Body.FlushAsync();
                     }
 
-                    await response.Body.FlushAsync();
                     await Task.Delay(1 * 1000 );
                 }
-            }            
+            }
 
         }
     }
