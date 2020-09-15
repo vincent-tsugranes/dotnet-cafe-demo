@@ -64,7 +64,7 @@ namespace dotnet.cafe.web.Controllers
                         // Ensure the consumer leaves the group cleanly and final offsets are committed.
                         c.Close();
                     }
-                }, cancellationToken);
+                });
                 
                 for(var i = 0; true; ++i)
                 {
@@ -73,11 +73,11 @@ namespace dotnet.cafe.web.Controllers
                         LineItemEvent item = JsonSerializer.Deserialize<LineItemEvent>(message);
                         DashboardUpdate dashboardUpdate = new DashboardUpdate(item);
                         
-                        await response.WriteAsync($"data: Message {dashboardUpdate.ToString()} at {DateTime.Now}\n\n", cancellationToken: cancellationToken);                        
+                        await response.WriteAsync($"data: Message {dashboardUpdate.ToString()} at {DateTime.Now}\n\n");                        
                     }
 
-                    await response.Body.FlushAsync(cancellationToken);
-                    await Task.Delay(1 * 1000, cancellationToken);
+                    await response.Body.FlushAsync();
+                    await Task.Delay(1 * 1000 );
                 }
             }            
 
