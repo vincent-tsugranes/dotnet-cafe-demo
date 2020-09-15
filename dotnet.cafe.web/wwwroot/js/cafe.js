@@ -152,7 +152,7 @@ $("#order_form").submit(function(event){
             xhrObj.setRequestHeader("Accept","application/json");
         },
         type: "POST",
-        url: "http://localhost:8080/order",
+        url: "/api/Orders",
         data: JSON.stringify(order),
         success: function(){ console.log('success for ' + JSON.stringify(order)); },
         contentType: 'application/json',
@@ -285,7 +285,7 @@ function displayFriendlyItem(item){
             break;
         case "ESPRESSO":
             console.log("Espresso");
-            result = Espresso
+            result = "Espresso";
             break;
         case "ESPRESSO_DOUBLE":
             console.log("Double Espresso");

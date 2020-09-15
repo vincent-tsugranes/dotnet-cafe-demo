@@ -5,17 +5,27 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using dotnet.cafe.domain;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dotnet.cafe.web.Controllers
 {
 
+    [Route("/api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    public class OrdersController : ControllerBase
     {
+
+        [HttpGet]
+        public string Get(int id)
+        {
+            return "Order " + id;
+        }
+        
         [HttpPost]
-        [Route("/order")]
-        public async Task<HttpResponseMessage> orderIn(CreateOrderCommand createOrderCommand)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<HttpResponseMessage> Post([FromBody] CreateOrderCommand createOrderCommand)
         {
             HttpResponseMessage returnMessage;
             try

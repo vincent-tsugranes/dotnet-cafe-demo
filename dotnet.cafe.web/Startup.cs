@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,7 +25,13 @@ namespace dotnet.cafe.web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,26 +62,6 @@ namespace dotnet.cafe.web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
             
-            /*app.Use(async (context, next) =>
-            {
-                if (context.Request.Path.ToString().Equals("/sse"))
-                {
-                    var response = context.Response;
-                    response.Headers.Add("Content-Type", "text/event-stream");
-
-                    for(var i = 0; true; ++i)
-                    {
-                        // WriteAsync requires `using Microsoft.AspNetCore.Http`
-                        await response
-                            .WriteAsync($"data: Middleware {i} at {DateTime.Now}\r\r");
-
-                        await response.Body.FlushAsync();
-                        await Task.Delay(5 * 1000);
-                    }
-                }
-
-                await next.Invoke();
-            });*/
         }
     }
 }
