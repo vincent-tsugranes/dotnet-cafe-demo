@@ -22,7 +22,9 @@ namespace dotnet.cafe.web.Controllers
             var response = Response;
             response.StatusCode = 200;
             response.Headers.Add("Content-Type", "text/event-stream");
-
+            response.Headers.Add("Cache-Control", "no-cache");
+            response.Headers.Add("Connection", "keep-alive");
+            
             ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
             
             String kafkaBootstrap = Environment.GetEnvironmentVariable("DOTNET_CAFE_KAFKA_BOOTSTRAP") ?? "127.0.0.1:9099";
@@ -32,6 +34,7 @@ namespace dotnet.cafe.web.Controllers
                 GroupId = cafeKafkaSettings.GroupId,
                 BootstrapServers = cafeKafkaSettings.BootstrapServers,
                 AutoOffsetReset = AutoOffsetReset.Earliest,
+                SocketKeepaliveEnable = true,
                 AllowAutoCreateTopics = true
             };
             

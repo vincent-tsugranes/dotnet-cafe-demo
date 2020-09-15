@@ -24,6 +24,7 @@ namespace dotnet.cafe.barista.Services
                     GroupId = cafeKafkaSettings.GroupId,
                     BootstrapServers = cafeKafkaSettings.BootstrapServers,
                     AutoOffsetReset = AutoOffsetReset.Earliest,
+                    SocketKeepaliveEnable = true,
                     AllowAutoCreateTopics = true
                 };
 
