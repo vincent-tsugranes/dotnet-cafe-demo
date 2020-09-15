@@ -50,7 +50,7 @@ namespace dotnet.cafe.kitchen.Services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
-                string topicName = "orders-in";
+                string topicName = "kitchen-in";
                 c.Subscribe(topicName);
                 Console.WriteLine("Kitchen Service Listening to: " + topicName);
 

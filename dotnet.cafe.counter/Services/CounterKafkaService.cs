@@ -68,8 +68,9 @@ namespace dotnet.cafe.counter.services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
-                c.Subscribe("web-in");
-                Console.WriteLine("Counter Service Listening to: web-in");
+                string topic = "web-in";
+                c.Subscribe(topic);
+                Console.WriteLine("Counter Service Listening to: " + topic);
 
                 try
                 {
@@ -78,7 +79,7 @@ namespace dotnet.cafe.counter.services
                         try
                         {
                             var cr = c.Consume(cancellationToken);
-                            Console.WriteLine($"orderIn:'{cr.Message.Value}'");
+                            Console.WriteLine(topic + ":" + cr.Message.Value);
                             CreateOrderCommand orderCommand = JsonUtil.createOrderCommandFromJson(cr.Message.Value);
                             handleCreateOrderCommand(orderCommand);
                         }
@@ -100,8 +101,9 @@ namespace dotnet.cafe.counter.services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
-                c.Subscribe("orders-out");
-                Console.WriteLine("Counter Service Listening to: orders-out");
+                string topic = "orders-out";
+                c.Subscribe(topic);
+                Console.WriteLine("Counter Service Listening to: " + topic);
                 try
                 {
                     while (!cancellationToken.IsCancellationRequested)
@@ -109,9 +111,9 @@ namespace dotnet.cafe.counter.services
                         try
                         {
                             var cr = c.Consume(cancellationToken);
-                            Console.WriteLine($"orders-out:'{cr.Message.Value}'");
-                            OrderUpEvent orderUpEvent = JsonSerializer.Deserialize<OrderUpEvent>(cr.Message.Value);
-                            sendWebUpdate(orderUpEvent);
+                            Console.WriteLine(topic + ":" + cr.Message.Value);
+                            //OrderUpEvent orderUpEvent = JsonSerializer.Deserialize<OrderUpEvent>(cr.Message.Value);
+                            sendWebUpdate(cr.Message.Value);
                             
                         }
                         catch (ConsumeException e)
@@ -133,8 +135,9 @@ namespace dotnet.cafe.counter.services
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("orders-in", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
-                    sendWebUpdate(itemEvent);
+                    string itemString = JsonSerializer.Serialize(itemEvent);
+                    var dr = await p.ProduceAsync("barista-in", new Message<Null, string> { Value = itemString });
+                    sendWebUpdate(itemString);
                     Console.WriteLine($"Sending Order to Barista '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)
@@ -149,8 +152,10 @@ namespace dotnet.cafe.counter.services
             {
                 try
                 {
-                    var dr = await p.ProduceAsync("orders-in", new Message<Null, string> { Value = JsonSerializer.Serialize(itemEvent) });
-                    sendWebUpdate(itemEvent);
+                    string itemString = JsonSerializer.Serialize(itemEvent);
+                    
+                    var dr = await p.ProduceAsync("kitchen-in", new Message<Null, string> { Value = itemString });
+                    sendWebUpdate(itemString);
                     Console.WriteLine($"Sending Order to Kitchen '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)
@@ -160,12 +165,11 @@ namespace dotnet.cafe.counter.services
             }
         }
         
-        private async void sendWebUpdate(LineItemEvent itemEvent) {
+        private async void sendWebUpdate(string itemString) {
             using (var p = new ProducerBuilder<Null, string>(_producerConfig).Build())
             {
                 try
                 {
-                    string itemString = JsonSerializer.Serialize(itemEvent);
                     var dr = await p.ProduceAsync("web-updates-out", new Message<Null, string> { Value = itemString });
                     Console.WriteLine($"Sending Order to Web '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }

@@ -50,7 +50,7 @@ namespace dotnet.cafe.barista.Services
         {
             using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
-                string topicName = "orders-in";
+                string topicName = "barista-in";
                 c.Subscribe(topicName);
                 Console.WriteLine("Barista Service Listening to: " + topicName);
 

@@ -47,7 +47,7 @@ namespace dotnet.cafe.web.Controllers
                 {
                     while (queue.TryDequeue(out var message))
                     {
-                        LineItemEvent item = JsonSerializer.Deserialize<LineItemEvent>(message);
+                        OrderUpEvent item = JsonSerializer.Deserialize<OrderUpEvent>(message);
                         DashboardUpdate dashboardUpdate = new DashboardUpdate(item);
 
                         var serializerOptions = new JsonSerializerOptions
