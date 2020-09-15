@@ -16,11 +16,8 @@ namespace dotnet.cafe.barista.Domain
         {
             try
             {
-                String hostName = Environment.MachineName;
-                if (hostName.Length <= 0)
-                {
-                    madeBy = "default";
-                }
+                String hostName = System.Net.Dns.GetHostName();
+                madeBy = hostName.Length <= 0 ? "default" : hostName;
             }
             catch (IOException e)
             {

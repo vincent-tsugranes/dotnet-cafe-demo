@@ -61,7 +61,7 @@ namespace dotnet.cafe.kitchen.Services
                         try
                         {
                             var cr = c.Consume(cancellationToken);
-                            Console.WriteLine($"Kitchen Service Received" + topicName +":'{cr.Message.Value}'");
+                            Console.WriteLine($"Kitchen Service Received " + topicName + ":" + cr.Message.Value);
                             HandleOrderIn(cr.Message.Value, cancellationToken);
                         }
                         catch (ConsumeException e)

@@ -17,10 +17,7 @@ namespace dotnet.cafe.kitchen.Domain
             try
             {
                 String hostName = Environment.MachineName;
-                if (hostName.Length <= 0)
-                {
-                    madeBy = "default";
-                }
+                madeBy = hostName.Length <= 0 ? "default" : hostName;
             }
             catch (IOException e)
             {

@@ -61,7 +61,7 @@ namespace dotnet.cafe.barista.Services
                         try
                         {
                             var cr = c.Consume(cancellationToken);
-                            Console.WriteLine($"Barista Service Received" + topicName +":'{cr.Message.Value}'");
+                            Console.WriteLine($"Barista Service Received " + topicName + ":" + cr.Message.Value);
                             HandleOrderIn(cr.Message.Value, cancellationToken);
 
                         }
