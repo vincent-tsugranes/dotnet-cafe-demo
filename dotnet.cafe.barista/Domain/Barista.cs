@@ -10,20 +10,29 @@ namespace dotnet.cafe.barista.Domain
     {
         //static final Logger logger = LoggerFactory.getLogger(Barista.class);
 
-        private string madeBy { get; set; }
+        private String madeBy = "undefined";
         
-        void setHostName() {
+        void setHostName()
+        {
             try
             {
-                madeBy = Environment.MachineName;
-            } catch (IOException e) {
-                //logger.debug("unable to get hostname");
+                String hostName = Environment.MachineName;
+                if (hostName.Length <= 0)
+                {
+                    madeBy = "default";
+                }
+            }
+            catch (IOException e)
+            {
+                //logger.info("unable to get hostname; using default");
                 madeBy = "unknown";
             }
         }
 
-        public async Task<OrderUpEvent> make(OrderInEvent orderInEvent) {
-
+        public async Task<OrderUpEvent> make(OrderInEvent orderInEvent)
+        {
+            setHostName();
+            
             //logger.debug("orderIn: " + orderInEvent.toString());
 
             switch(orderInEvent.item){

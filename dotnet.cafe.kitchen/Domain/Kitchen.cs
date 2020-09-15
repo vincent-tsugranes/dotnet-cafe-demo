@@ -31,7 +31,8 @@ namespace dotnet.cafe.kitchen.Domain
 
         public async Task<OrderUpEvent> make(OrderInEvent orderInEvent)
         {
-
+            setHostName();
+            
             //logger.debug("orderIn: " + orderInEvent.toString());
 
             switch (orderInEvent.item)
@@ -50,7 +51,7 @@ namespace dotnet.cafe.kitchen.Domain
 
             async Task<OrderUpEvent> prepare(OrderInEvent orderInEvent, int seconds)
             {
-
+               
                 try
                 {
                     await Task.Delay(seconds * 1000);
