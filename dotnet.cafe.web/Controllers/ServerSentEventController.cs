@@ -41,7 +41,7 @@ namespace dotnet.cafe.web.Controllers
             using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
                 c.Subscribe("web-updates-out");
-                Task.Run(() =>
+                await Task.Run(() =>
                 {
                     try
                     {
@@ -64,21 +64,20 @@ namespace dotnet.cafe.web.Controllers
                         // Ensure the consumer leaves the group cleanly and final offsets are committed.
                         c.Close();
                     }
-                });
+                }, cancellationToken);
                 
                 for(var i = 0; true; ++i)
                 {
-                    String message;
-                    while (queue.TryDequeue(out message))
+                    while (queue.TryDequeue(out var message))
                     {
                         LineItemEvent item = JsonSerializer.Deserialize<LineItemEvent>(message);
                         DashboardUpdate dashboardUpdate = new DashboardUpdate(item);
                         
-                        await response.WriteAsync($"data: Message {dashboardUpdate.ToString()} at {DateTime.Now}\r\r", cancellationToken: cancellationToken);                        
+                        await response.WriteAsync($"data: Message {dashboardUpdate.ToString()} at {DateTime.Now}\n\n", cancellationToken: cancellationToken);                        
                     }
 
                     await response.Body.FlushAsync(cancellationToken);
-                    await Task.Delay(1 * 1000);
+                    await Task.Delay(1 * 1000, cancellationToken);
                 }
             }            
 
