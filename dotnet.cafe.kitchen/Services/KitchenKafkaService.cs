@@ -87,7 +87,7 @@ namespace dotnet.cafe.kitchen.Services
                 Console.WriteLine($"Kitchen Making Order " + message);
                 _kitchen.make(orderIn).ContinueWith(async o =>
                 {
-                    String orderUpJson = JsonSerializer.Serialize(o);
+                    String orderUpJson = JsonSerializer.Serialize(o.Result);
                     await SendMessage(orderUpJson);
                 }, cancellationToken);
             }

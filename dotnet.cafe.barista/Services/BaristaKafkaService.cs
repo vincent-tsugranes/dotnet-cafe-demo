@@ -86,7 +86,7 @@ namespace dotnet.cafe.barista.Services
                 Console.WriteLine($"Barista Making Order " + message);
                 _barista.make(orderIn).ContinueWith(async o =>
                 {
-                    String orderUpJson = JsonSerializer.Serialize(o);
+                    String orderUpJson = JsonSerializer.Serialize(o.Result);
                     await SendMessage(orderUpJson);
                 }, cancellationToken);
             }
