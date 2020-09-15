@@ -12,24 +12,20 @@ namespace dotnet.cafe.kitchen
     class Program
     {
 
-        private static readonly AutoResetEvent _closingEvent = new AutoResetEvent(false);
-        
         static async Task Main(string[] args)
         {
+            var tokenSource = new CancellationTokenSource();
             String kafkaBootstrap = Environment.GetEnvironmentVariable("DOTNET_CAFE_KAFKA_BOOTSTRAP") ?? "127.0.0.1:9099";
-            //String mongoDB = Environment.GetEnvironmentVariable("DOTNET_CAFE_MONGODB") ?? "mongodb://127.0.0.1:27017";
 
-            KitchenKafkaService kafkaService = new KitchenKafkaService(new CafeKafkaSettings(kafkaBootstrap));
-            await Task.Factory.StartNew(kafkaService.Run);
-            
             Console.WriteLine("Press Ctrl + C to cancel");
-            Console.CancelKeyPress += ((s, a) =>
+            Console.CancelKeyPress += (s, a) =>
             {
+                tokenSource.Cancel();
                 Console.WriteLine("Exiting");
-                _closingEvent.Set();
-            });
- 
-            _closingEvent.WaitOne();
+            };
+            
+            KitchenKafkaService kafkaService = new KitchenKafkaService(new CafeKafkaSettings(kafkaBootstrap));
+            await kafkaService.Run(tokenSource.Token);
         }
         
         

@@ -11,24 +11,21 @@ namespace dotnet.cafe.counter
 {
     public class Program
     {
-        private static readonly AutoResetEvent _closingEvent = new AutoResetEvent(false);
-
         public static async Task Main(string[] args)
         {
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
             String kafkaBootstrap = Environment.GetEnvironmentVariable("DOTNET_CAFE_KAFKA_BOOTSTRAP") ?? "127.0.0.1:9099";
             String mongoDB = Environment.GetEnvironmentVariable("DOTNET_CAFE_MONGODB") ?? "mongodb://127.0.0.1:27017";
 
-            CounterKafkaService kafkaService = new CounterKafkaService(new CafeDatabaseSettings(mongoDB), new CafeKafkaSettings(kafkaBootstrap));
-            await Task.Factory.StartNew(kafkaService.Run);
-            
             Console.WriteLine("Press Ctrl + C to cancel");
-            Console.CancelKeyPress += ((s, a) =>
+            Console.CancelKeyPress += (s, a) =>
             {
+                tokenSource.Cancel();
                 Console.WriteLine("Exiting");
-                _closingEvent.Set();
-            });
- 
-            _closingEvent.WaitOne();
+            };
+            
+            CounterKafkaService kafkaService = new CounterKafkaService(new CafeDatabaseSettings(mongoDB), new CafeKafkaSettings(kafkaBootstrap));
+            await kafkaService.Run(tokenSource.Token);
         }
     }
 }

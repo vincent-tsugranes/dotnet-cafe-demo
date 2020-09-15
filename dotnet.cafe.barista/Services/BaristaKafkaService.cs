@@ -41,25 +41,29 @@ namespace dotnet.cafe.barista.Services
             }
         }
         
-        public void Run()
+        public async Task Run(CancellationToken token)
         {
-            using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
+            await Task.Run(() => { ConsumeOrdersInKafka(_consumerConfig, token); }, token);
+        }
+        
+        void ConsumeOrdersInKafka(ConsumerConfig consumerConfig, CancellationToken cancellationToken)
+        {
+            using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
                 string topicName = "orders-in";
                 c.Subscribe(topicName);
-                Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
-                
-                CancellationTokenSource cts = new CancellationTokenSource();
+                Console.WriteLine("Barista Service Listening to: " + topicName);
+
                 try
                 {
-                    while (true)
+                    while (!cancellationToken.IsCancellationRequested)
                     {
                         try
                         {
-                            var cr = c.Consume(cts.Token);
-                            Console.WriteLine($"orderIn:'{cr.Message.Value}'");
-                            
-                            HandleOrderIn(cr.Message.Value, cts);
+                            var cr = c.Consume(cancellationToken);
+                            Console.WriteLine($"Barista Service Received" + topicName +":'{cr.Message.Value}'");
+                            HandleOrderIn(cr.Message.Value, cancellationToken);
+
                         }
                         catch (ConsumeException e)
                         {
@@ -74,18 +78,17 @@ namespace dotnet.cafe.barista.Services
                 }
             }
         }
-
-        private void HandleOrderIn(string message, CancellationTokenSource cts)
+        private void HandleOrderIn(string message, CancellationToken cancellationToken)
         {
-            //logger.debug("\nBarista Order In Received: {}", message.getPayload());
             OrderInEvent orderIn = JsonSerializer.Deserialize<OrderInEvent>(message);
             if (orderIn.eventType.Equals(EventType.BEVERAGE_ORDER_IN))
             {
+                Console.WriteLine($"Barista Making Order " + message);
                 _barista.make(orderIn).ContinueWith(async o =>
                 {
                     String orderUpJson = JsonSerializer.Serialize(o);
                     await SendMessage(orderUpJson);
-                }, cts.Token);
+                }, cancellationToken);
             }
         }
 

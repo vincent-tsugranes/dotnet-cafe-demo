@@ -58,26 +58,61 @@ namespace dotnet.cafe.counter.services
             
         }
 
-        public void Run()
+        public async Task Run(CancellationToken token)
         {
-            using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
+            Task.Run(() => { ConsumeWebInKafka(_consumerConfig, token); });
+            await Task.Run(() => { ConsumeOrdersOutKafka(_consumerConfig, token); });
+        }
+        
+        void ConsumeWebInKafka(ConsumerConfig consumerConfig, CancellationToken cancellationToken)
+        {
+            using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
-                string topicName = "web-in";
-                c.Subscribe(topicName);
-                Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
-                
-                CancellationTokenSource cts = new CancellationTokenSource();
-                
+                c.Subscribe("web-in");
+                Console.WriteLine("Counter Service Listening to: web-in");
+
                 try
                 {
-                    while (true)
+                    while (!cancellationToken.IsCancellationRequested)
                     {
                         try
                         {
-                            var cr = c.Consume(cts.Token);
+                            var cr = c.Consume(cancellationToken);
                             Console.WriteLine($"orderIn:'{cr.Message.Value}'");
                             CreateOrderCommand orderCommand = JsonUtil.createOrderCommandFromJson(cr.Message.Value);
                             handleCreateOrderCommand(orderCommand);
+                        }
+                        catch (ConsumeException e)
+                        {
+                            Console.WriteLine($"Error occured: {e.Error.Reason}");
+                        }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Ensure the consumer leaves the group cleanly and final offsets are committed.
+                    c.Close();
+                }
+            }
+        }
+        
+        void ConsumeOrdersOutKafka(ConsumerConfig consumerConfig, CancellationToken cancellationToken)
+        {
+            using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
+            {
+                c.Subscribe("orders-out");
+                Console.WriteLine("Counter Service Listening to: orders-out");
+                try
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        try
+                        {
+                            var cr = c.Consume(cancellationToken);
+                            Console.WriteLine($"orders-out:'{cr.Message.Value}'");
+                            OrderUpEvent orderUpEvent = JsonSerializer.Deserialize<OrderUpEvent>(cr.Message.Value);
+                            sendWebUpdate(orderUpEvent);
+                            
                         }
                         catch (ConsumeException e)
                         {

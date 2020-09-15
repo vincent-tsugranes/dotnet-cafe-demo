@@ -41,35 +41,28 @@ namespace dotnet.cafe.kitchen.Services
             }
         }
         
-        public void Run()
+        public async Task Run(CancellationToken token)
         {
-            using (var c = new ConsumerBuilder<Ignore, string>(_consumerConfig).Build())
+            await Task.Run(() => { ConsumeOrdersInKafka(_consumerConfig, token); }, token);
+        }
+
+        void ConsumeOrdersInKafka(ConsumerConfig consumerConfig, CancellationToken cancellationToken)
+        {
+            using (var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
             {
                 string topicName = "orders-in";
                 c.Subscribe(topicName);
-                Console.WriteLine("Subscribed to Kafka Topic: " + topicName);
-                
-                CancellationTokenSource cts = new CancellationTokenSource();
-                
+                Console.WriteLine("Kitchen Service Listening to: " + topicName);
+
                 try
                 {
-                    while (true)
+                    while (!cancellationToken.IsCancellationRequested)
                     {
                         try
                         {
-                            var cr = c.Consume(cts.Token);
-                            Console.WriteLine($"orderIn:'{cr.Message.Value}'");
-                            
-                            //logger.debug("\nBarista Order In Received: {}", message.getPayload());
-                            OrderInEvent orderIn = JsonSerializer.Deserialize<OrderInEvent>(cr.Message.Value);
-
-                            if (orderIn.eventType.Equals(EventType.KITCHEN_ORDER_IN)) {
-                                _kitchen.make(orderIn).ContinueWith(async o =>
-                                {
-                                    String orderUpJson = JsonSerializer.Serialize(o);
-                                    await SendMessage(orderUpJson);
-                                }, cts.Token);
-                            }
+                            var cr = c.Consume(cancellationToken);
+                            Console.WriteLine($"Kitchen Service Received" + topicName +":'{cr.Message.Value}'");
+                            HandleOrderIn(cr.Message.Value, cancellationToken);
                         }
                         catch (ConsumeException e)
                         {
@@ -82,6 +75,21 @@ namespace dotnet.cafe.kitchen.Services
                     // Ensure the consumer leaves the group cleanly and final offsets are committed.
                     c.Close();
                 }
+            }
+        }
+
+        private void HandleOrderIn(string message, CancellationToken cancellationToken)
+        {
+            OrderInEvent orderIn = JsonSerializer.Deserialize<OrderInEvent>(message);
+
+            if (orderIn.eventType.Equals(EventType.KITCHEN_ORDER_IN))
+            {
+                Console.WriteLine($"Kitchen Making Order " + message);
+                _kitchen.make(orderIn).ContinueWith(async o =>
+                {
+                    String orderUpJson = JsonSerializer.Serialize(o);
+                    await SendMessage(orderUpJson);
+                }, cancellationToken);
             }
         }
 
