@@ -187,9 +187,14 @@ hr {
   display:block;
 }
 /*--------------------------------------- NAVIGATION ---------------------------------------------*/
+nav .navbar {
+/*  position: fixed;
+  width: 100%;*/
+}
+
 nav.navbar-inverse {
-  background: transparent;
-  border-bottom: none;
+/*  background: transparent;
+  border-bottom: none;*/
 }
 nav .navbar-brand {
   color:#c02628!important;
@@ -201,12 +206,12 @@ nav a {
   font-size: 15px;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
-/*  color: #fff!important;*/
+  color: #fff!important;
   font-weight: 300;
   text-transform:uppercase;
 }
 nav.shrink {
-  background: #fff;
+/*  background: #fff;*/
 }
 nav.shrink .navbar-brand {
   color:#c02628!important;
@@ -214,9 +219,9 @@ nav.shrink .navbar-brand {
 nav.shrink .navbar-toggle {
   background:#c02628;
 }
-nav.shrink a {
+/*nav.shrink a {
   color:#535353!important;
-}
+}*/
 nav a.active {
   color:#c02628!important;
 }
@@ -226,6 +231,7 @@ nav a.active {
   background-size: cover;
   box-shadow: 0px 0px 0px 2038px rgba(0, 0, 0, 0.30) inset;
   margin-bottom: 0;
+  margin-top: -32px;
 }
 .banner .jumbotron {
   padding: 0;

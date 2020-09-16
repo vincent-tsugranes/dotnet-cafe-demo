@@ -61,7 +61,12 @@ namespace dotnet.cafe.counter.services
         public async Task Run(CancellationToken token)
         {
             Task.Run(() => { ConsumeWebInKafka(_consumerConfig, token); });
-            await Task.Run(() => { ConsumeOrdersOutKafka(_consumerConfig, token); });
+            Task.Run(() => { ConsumeOrdersOutKafka(_consumerConfig, token); });
+
+            while (!token.IsCancellationRequested)
+            {
+                await Task.Delay(1 * 1000);
+            }
         }
         
         void ConsumeWebInKafka(ConsumerConfig consumerConfig, CancellationToken cancellationToken)
