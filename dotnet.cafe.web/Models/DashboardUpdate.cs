@@ -16,6 +16,7 @@ namespace dotnet.cafe.web.Models
 
         public OrderStatus status { get; set; }
         
+        public String madeBy { get; set; }
         public DashboardUpdate() {
         }
         
@@ -27,11 +28,12 @@ namespace dotnet.cafe.web.Models
             this.status = status;
         }
         
-        public DashboardUpdate(LineItemEvent orderEvent) {
+        public DashboardUpdate(OrderUpEvent orderEvent) {
             this.orderId = orderEvent.orderId;
             this.itemId = orderEvent.itemId;
             this.name = orderEvent.name;
             this.item = orderEvent.item;
+            this.madeBy = orderEvent.madeBy;
             switch (orderEvent.eventType) {
                 case EventType.BEVERAGE_ORDER_IN:
                     this.status = OrderStatus.IN_QUEUE;
