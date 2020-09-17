@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.web", "dotnet.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.barista", "dotnet.cafe.barista\dotnet.cafe.barista.csproj", "{3D6019AE-741D-4E5F-B554-2AF10BF8445F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet.cafe.inventory", "dotnet.cafe.inventory\dotnet.cafe.inventory.csproj", "{1F999BB8-DE11-4E63-8796-597D950496C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{3D6019AE-741D-4E5F-B554-2AF10BF8445F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D6019AE-741D-4E5F-B554-2AF10BF8445F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D6019AE-741D-4E5F-B554-2AF10BF8445F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F999BB8-DE11-4E63-8796-597D950496C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F999BB8-DE11-4E63-8796-597D950496C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F999BB8-DE11-4E63-8796-597D950496C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F999BB8-DE11-4E63-8796-597D950496C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
