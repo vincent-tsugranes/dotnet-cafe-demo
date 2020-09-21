@@ -117,7 +117,6 @@ namespace dotnet.cafe.counter.services
                         {
                             var cr = c.Consume(cancellationToken);
                             Console.WriteLine(topic + ":" + cr.Message.Value);
-                            //OrderUpEvent orderUpEvent = JsonSerializer.Deserialize<OrderUpEvent>(cr.Message.Value);
                             sendWebUpdate(cr.Message.Value);
                             
                         }

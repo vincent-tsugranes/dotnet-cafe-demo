@@ -2,7 +2,7 @@ using System;
 
 namespace dotnet.cafe.domain
 {
-    public class LineItemEvent
+    public class LineItemEvent : Event
     {
         public String itemId { get; set; }
         public String orderId { get; set; }
@@ -32,6 +32,11 @@ namespace dotnet.cafe.domain
             this.orderId = orderId;
             this.name = name;
             this.item = item;
-        }       
+        }
+
+        public EventType getEventType()
+        {
+            return this.eventType;
+        }
     }
 }

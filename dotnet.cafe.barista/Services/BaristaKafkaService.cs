@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -84,10 +85,17 @@ namespace dotnet.cafe.barista.Services
             if (orderIn.eventType.Equals(EventType.BEVERAGE_ORDER_IN))
             {
                 Console.WriteLine($"Barista Making Order " + message);
-                _barista.make(orderIn).ContinueWith(async o =>
+                
+                _barista.make(orderIn).ContinueWith(async baristaOutput =>
                 {
-                    String orderUpJson = JsonSerializer.Serialize(o.Result);
-                    await SendMessage(orderUpJson);
+                    Event orderUp = baristaOutput.Result.First();
+                    if (orderUp.GetType() == typeof(OrderUpEvent))
+                    {
+                        String orderUpJson = JsonSerializer.Serialize((OrderUpEvent)orderUp);
+                        //String orderUpJson = JsonSerializer.Serialize(o.Result);
+                        await SendMessage(orderUpJson);                       
+                    }
+ 
                 }, cancellationToken);
             }
         }

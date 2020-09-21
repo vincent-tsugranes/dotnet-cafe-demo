@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,12 @@ namespace dotnet.cafe.kitchen.Domain
 
         private String madeBy = "undefined";
         
+        Inventory inventory;
+
+        public Kitchen()
+        {
+            inventory = new Inventory();
+        }
         void setHostName()
         {
             try
@@ -26,11 +33,9 @@ namespace dotnet.cafe.kitchen.Domain
             }
         }
 
-        public async Task<OrderUpEvent> make(OrderInEvent orderInEvent)
+        public async Task<List<Event>> make(OrderInEvent orderInEvent)
         {
             setHostName();
-            
-            //logger.debug("orderIn: " + orderInEvent.toString());
 
             switch (orderInEvent.item)
             {
@@ -46,27 +51,39 @@ namespace dotnet.cafe.kitchen.Domain
                     return await prepare(orderInEvent, 11);
             }
 
-            async Task<OrderUpEvent> prepare(OrderInEvent orderInEvent, int seconds)
+        }
+        async Task<List<Event>> prepare(OrderInEvent orderInEvent, int seconds)
+        {
+            // decrement the item in inventory
+            try 
             {
-               
-                try
-                {
-                    await Task.Delay(seconds * 1000);
-                }
-                catch (ThreadInterruptedException e)
-                {
-                    Thread.CurrentThread.Interrupt();
-                }
+                inventory.decrementItem(orderInEvent.item);
+            }
+            catch (EightySixException e) 
+            {
+                Console.WriteLine(orderInEvent.item + " is 86'd");
+                return new List<Event> {new EightySixEvent(orderInEvent.item)};
+            }
+            
+            try
+            {
+                await Task.Delay(seconds * 1000);
+            }
+            catch (ThreadInterruptedException e)
+            {
+                Thread.CurrentThread.Interrupt();
+            }
 
-                return new OrderUpEvent(
+            return new List<Event>
+            {
+                new OrderUpEvent(
                     EventType.KITCHEN_ORDER_UP,
                     orderInEvent.orderId,
                     orderInEvent.name,
                     orderInEvent.item,
                     orderInEvent.itemId,
-                    madeBy);
-
-            }
+                    madeBy)
+            };
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,12 @@ namespace dotnet.cafe.barista.Domain
 
         private String madeBy = "undefined";
         
+        Inventory inventory;
+
+        public Barista()
+        {
+            inventory = new Inventory();
+        }
         void setHostName()
         {
             try
@@ -26,7 +33,7 @@ namespace dotnet.cafe.barista.Domain
             }
         }
 
-        public async Task<OrderUpEvent> make(OrderInEvent orderInEvent)
+        public async Task<List<Event>> make(OrderInEvent orderInEvent)
         {
             setHostName();
             
@@ -48,8 +55,27 @@ namespace dotnet.cafe.barista.Domain
                 }
         }
 
-        private async Task<OrderUpEvent> prepare(OrderInEvent orderInEvent, int seconds) {
+        private async Task<List<Event>> prepare(OrderInEvent orderInEvent, int seconds) {
 
+            // decrement the item in inventory
+            try 
+            {
+                inventory.decrementItem(orderInEvent.item);
+            } 
+            catch (EightySixException e) {
+                Console.WriteLine(orderInEvent.item + " is 86'd");
+                return new List<Event> {new EightySixEvent(orderInEvent.item)};
+            } 
+            catch (EightySixCoffeeException e) {
+                // 86 both coffee items
+                Console.WriteLine("coffee is 86'd");
+                return new List<Event>
+                {
+                    new EightySixEvent(Item.COFFEE_WITH_ROOM),
+                    new EightySixEvent(Item.COFFEE_BLACK)
+                };
+            }
+            
             try
             {
                 await Task.Delay(seconds * 1000);
@@ -59,13 +85,16 @@ namespace dotnet.cafe.barista.Domain
                 Thread.CurrentThread.Interrupt();
             }
 
-            return new OrderUpEvent(
-                EventType.BEVERAGE_ORDER_UP,
-                orderInEvent.orderId,
-                orderInEvent.name,
-                orderInEvent.item,
-                orderInEvent.itemId,
-                madeBy);
+            return new List<Event>
+            {
+                new OrderUpEvent(
+                    EventType.BEVERAGE_ORDER_UP,
+                    orderInEvent.orderId,
+                    orderInEvent.name,
+                    orderInEvent.item,
+                    orderInEvent.itemId,
+                    madeBy)
+            };
         }        
     }
 }

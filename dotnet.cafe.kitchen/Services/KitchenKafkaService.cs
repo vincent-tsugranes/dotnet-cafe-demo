@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
@@ -85,10 +87,21 @@ namespace dotnet.cafe.kitchen.Services
             if (orderIn.eventType.Equals(EventType.KITCHEN_ORDER_IN))
             {
                 Console.WriteLine($"Kitchen Making Order " + message);
-                _kitchen.make(orderIn).ContinueWith(async o =>
+                /*List<Event> kitchenOutput = await _kitchen.make(orderIn);
+                
+                String orderUpJson = JsonSerializer.Serialize(kitchenOutput.First());
+                await SendMessage(orderUpJson);*/
+                
+                _kitchen.make(orderIn).ContinueWith(async kitchenOutput =>
                 {
-                    String orderUpJson = JsonSerializer.Serialize(o.Result);
-                    await SendMessage(orderUpJson);
+                    Event orderUp = kitchenOutput.Result.First();
+                    if (orderUp.GetType() == typeof(OrderUpEvent))
+                    {
+                        String orderUpJson = JsonSerializer.Serialize((OrderUpEvent)orderUp);
+                        //String orderUpJson = JsonSerializer.Serialize(o.Result);
+                        await SendMessage(orderUpJson);                       
+                    }
+ 
                 }, cancellationToken);
             }
         }
