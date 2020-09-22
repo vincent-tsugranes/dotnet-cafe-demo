@@ -188,7 +188,14 @@ namespace dotnet.cafe.counter.services
             OrderCreatedEvent orderCreatedEvent = Order.processCreateOrderCommand(createOrderCommand);
             
 #if (!DEBUG)
-            await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
+    try
+    {
+        await _orderRepository.InsertOneAsync(orderCreatedEvent.order);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error occured with MongoDB: {ex.Error.Reason}");
+    }
 #endif
             
             orderCreatedEvent.getEvents().ForEach(e =>
