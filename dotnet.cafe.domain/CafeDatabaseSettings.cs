@@ -6,7 +6,7 @@ namespace dotnet.cafe.domain
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
 
-        public CafeDatabaseSettings(string connectionString, string databaseName = "OrdersDB", string ordersCollectionName = "Orders")
+        public CafeDatabaseSettings(string connectionString, string databaseName = "cafedb", string ordersCollectionName = "Orders")
         {
             this.ConnectionString = connectionString;
             this.DatabaseName = databaseName;
