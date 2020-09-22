@@ -58,7 +58,7 @@ DOTNET_CAFE_KAFKA_BOOTSTRAP
        -n dotnet-cafe-demo \
        --name=dotnet-cafe-counter dotnet:3.1~https://github.com/vincent-tsugranes/dotnet-cafe-demo.git \
        --build-env DOTNET_STARTUP_PROJECT=dotnet.cafe.counter/dotnet.cafe.counter.csproj \
-       -e DOTNET_CAFE_MONGODB=mongodb://cafe-user:redhat-20@dotnet-cafe-mongodb-service:27017 \
+       -e DOTNET_CAFE_MONGODB=mongodb://cafe-user:redhat-20@dotnet-cafe-mongodb-service:27017/cafedb \
        -e DOTNET_CAFE_KAFKA_BOOTSTRAP=cafe-cluster-kafka-bootstrap:9092 \
        -l app=dotnet-cafe-module
        
