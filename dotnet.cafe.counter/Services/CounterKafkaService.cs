@@ -194,7 +194,7 @@ namespace dotnet.cafe.counter.services
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Error occured with MongoDB: {ex.Error.Reason}");
+        Console.WriteLine($"Error occured with MongoDB: {ex}");
     }
 #endif
             
