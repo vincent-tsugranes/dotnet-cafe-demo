@@ -1,5 +1,11 @@
 # dotnet-cafe-demo
 
+This is a port of the Java Quarkus application available here:
+https://github.com/quarkuscoffeeshop/quarkuscoffeeshop-main
+
+The structure is extremely similar, but there are some differences based on this being idiomatic C#. A guide to the coding differences for Java developers is available in [this doc](JAVA.md).
+
+
 login to your openshift cluster
 
     oc login -u <USERNAME> -p <PASSWORD> --server=https://CLUSTER_API_DNS:6443
