@@ -6,16 +6,24 @@ https://github.com/quarkuscoffeeshop/quarkuscoffeeshop-main
 The structure is extremely similar, but there are some differences based on this being idiomatic C#. A guide to the coding differences for Java developers is available in [this doc](JAVA.md).
 
 
-login to your openshift cluster
+#Building and Deploying
+
+This uses an OpenShift tool called S2I (Source-to-Image). That basically means to deploy, you check your code into source control, then tell OpenShift to pull the code, build it, and deploy it automatically. This is as simple as it gets; no configuration files, no dockerfile, nothing but this oc new-app command, and everything gets created. You can then start subsequent build/deploys directly from the OpenShift web console.
+
+There are some internal links between services, like connecting to Kafka or MongoDB, and that's all done through environment variables based on the default object names; it will work the exact same way in your environment unless you explicitly change something.
+
+
+
+To get started, login to your openshift cluster
 
     oc login -u <USERNAME> -p <PASSWORD> --server=https://CLUSTER_API_DNS:6443
 
-create openshift project
+then create the openshift project - if you change the name here, you'll have to change all of the resource links in subsequent steps, you should only do that if you want to go off the reservation.
     
     oc new-project dotnet-cafe-demo
 
 # create mongodb
-create a mongodb ephemeral instance in the project
+create a mongodb ephemeral instance in the project. This sets the service name, credentials, and a DB for the project that are used in the connection strings later.
 
     oc new-app \
       -n dotnet-cafe-demo \
@@ -27,17 +35,18 @@ create a mongodb ephemeral instance in the project
       -p DATABASE_SERVICE_NAME=dotnet-cafe-mongodb-service
 
 # create kafka cluster
-This requires that the "Red Hat Integration - AMQ Streams" operator be installed on the cluster.
+*This requires that the "Red Hat Integration - AMQ Streams" operator be installed on the cluster. That operator will take the configuration from this yaml file, and deploy a 3-node kafka cluster.
 
 from the root of the dotnet-cafe-demo folder, run the create-kafka.yml script on OpenShift
 
     oc create -f create-kafka.yml
 
 # dotnet.cafe.kitchen
-build and deploy the dotnet.cafe.kitchen service and dependencies
+build and deploy the dotnet.cafe.kitchen service and dependencies. 
 
-set the environment variables for your OCP services
-DOTNET_CAFE_KAFKA_BOOTSTRAP
+The DOTNET_STARTUP_PROJECT parameter tells the build command which project should be build and run since multiple services are in the same solution, and then builds the dependencies as well. It also sets the DOTNET_CAFE_KAFKA_BOOTSTRAP runtime parameter to link to the kafka cluster we created above.
+
+If you fork the project, you'll need to change the git link
 
     oc new-app \
       -n dotnet-cafe-demo \

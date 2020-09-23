@@ -5,20 +5,24 @@ Some Java vs C# differences explained
 Maybe just me, but I've always found the deeply nested folders in java code annoying, we generally don't do so much of that in C#, but larger projects head in that direction.
 ### Java
 quarkus-cafe-barista
+
     /src/main/java/com/redhat/quarkus/cafe/barista/domain/Barista.java
 
 ### C#
 quarkus.cafe.barista
+
     /Domain/Barista.cs
 
 ## Services
-KafkaService.java vs BaristaKafkaService.cs - I only deviated here because it's a pain when you're debugging multiple microservices and they use the same class name; I think it leads to unnecessary confusion.
+KafkaService.java vs BaristaKafkaService.cs - I only deviated here because it's a pain when you're debugging multiple microservices and they use the same class name; it leads to unnecessary confusion.
 ### Java
 quarkus-cafe-barista
+
     /src/main/java/com/redhat/quarkus/cafe/barista/infrastructure/KafkaService.java
 
 ### C#
 quarkus.cafe.barista
+
     /Domain/Service/BaristaKafkaService.cs
 
 ## References
@@ -49,11 +53,11 @@ https://quarkus.io/guides/writing-native-applications-tips#alternative-with-regi
 In C#, we're using the relatively new System.Text.Json serializer/deserializer, which requires get/set for properties and behaves slightly differently from the Newtonsoft.Json library everyone used to use. Docs:
 https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-how-to
 
-        public class LineItem
-        {
-            public Item item { get; set; }
-            public String name { get; set; }
-            ...
+    public class LineItem
+    {
+        public Item item { get; set; }
+        public String name { get; set; }
+        ...
 
 This makes the marshalling code really easy, and we do it throughout like:
         
@@ -62,6 +66,7 @@ This makes the marshalling code really easy, and we do it throughout like:
 # Lambda Expressions
 Glad you guys finally got these in Java 8, because we've been doing this in C# since 3.0 in 2007
 ### Java
+
     kitchen.make(orderIn).thenApply(o -> {
 
 ### C#
@@ -74,6 +79,6 @@ Note that CompletableFuture and Task are very similar, but a good writeup of the
     https://softwareengineering.stackexchange.com/questions/393264/is-the-c-async-task-construct-equivalent-to-javas-executor-future
     
 ### Java
-        public CompletableFuture<Collection<Event>> make(final OrderInEvent orderInEvent) {
+    public CompletableFuture<Collection<Event>> make(final OrderInEvent orderInEvent) {
 ### C#
-        public async Task<List<Event>> make(OrderInEvent orderInEvent)
+    public async Task<List<Event>> make(OrderInEvent orderInEvent)

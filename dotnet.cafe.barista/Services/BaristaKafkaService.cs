@@ -92,7 +92,6 @@ namespace dotnet.cafe.barista.Services
                     if (orderUp.GetType() == typeof(OrderUpEvent))
                     {
                         String orderUpJson = JsonSerializer.Serialize((OrderUpEvent)orderUp);
-                        //String orderUpJson = JsonSerializer.Serialize(o.Result);
                         await SendMessage(orderUpJson);                       
                     }
  

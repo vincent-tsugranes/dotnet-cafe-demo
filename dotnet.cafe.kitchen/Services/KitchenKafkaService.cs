@@ -87,10 +87,6 @@ namespace dotnet.cafe.kitchen.Services
             if (orderIn.eventType.Equals(EventType.KITCHEN_ORDER_IN))
             {
                 Console.WriteLine($"Kitchen Making Order " + message);
-                /*List<Event> kitchenOutput = await _kitchen.make(orderIn);
-                
-                String orderUpJson = JsonSerializer.Serialize(kitchenOutput.First());
-                await SendMessage(orderUpJson);*/
                 
                 _kitchen.make(orderIn).ContinueWith(async kitchenOutput =>
                 {
@@ -98,7 +94,6 @@ namespace dotnet.cafe.kitchen.Services
                     if (orderUp.GetType() == typeof(OrderUpEvent))
                     {
                         String orderUpJson = JsonSerializer.Serialize((OrderUpEvent)orderUp);
-                        //String orderUpJson = JsonSerializer.Serialize(o.Result);
                         await SendMessage(orderUpJson);                       
                     }
  
