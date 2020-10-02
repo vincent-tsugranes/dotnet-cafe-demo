@@ -20,19 +20,9 @@ namespace dotnet.cafe.barista.Services
             _barista = new Barista();
             try
             {
-                _consumerConfig = new ConsumerConfig()
-                {
-                    GroupId = cafeKafkaSettings.GroupId,
-                    BootstrapServers = cafeKafkaSettings.BootstrapServers,
-                    AutoOffsetReset = AutoOffsetReset.Earliest,
-                    SocketKeepaliveEnable = true,
-                    AllowAutoCreateTopics = true
-                };
+                _consumerConfig = KafkaConfig.CreateConsumerConfig(cafeKafkaSettings);
 
-                _producerConfig = new ProducerConfig()
-                {
-                    BootstrapServers = cafeKafkaSettings.BootstrapServers
-                };
+                _producerConfig = KafkaConfig.CreateProducerConfig(cafeKafkaSettings);
                 
                 Console.WriteLine("Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
             }
