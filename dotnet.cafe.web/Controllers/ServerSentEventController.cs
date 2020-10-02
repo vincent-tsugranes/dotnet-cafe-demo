@@ -70,7 +70,7 @@ namespace dotnet.cafe.web.Controllers
                         {
                             var cr = c.Consume(cancellationToken);
                             var messageValue = cr.Message.Value;
-                            Console.WriteLine("Received message on web-updates-out: " + messageValue);
+                            Console.WriteLine(DateTime.Now + " - Received message on web-updates-out: " + messageValue);
                             queue.Enqueue(messageValue);
                         }
                         catch (ConsumeException e)

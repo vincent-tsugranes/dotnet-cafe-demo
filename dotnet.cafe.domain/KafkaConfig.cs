@@ -21,7 +21,8 @@ namespace dotnet.cafe.domain
         {
             return new ProducerConfig()
             {
-                BootstrapServers = kafkaSettings.BootstrapServers
+                BootstrapServers = kafkaSettings.BootstrapServers,
+                EnableIdempotence = true
             };
         }
     }

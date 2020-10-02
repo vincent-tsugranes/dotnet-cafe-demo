@@ -24,7 +24,7 @@ namespace dotnet.cafe.counter.services
 
                 _producerConfig = KafkaConfig.CreateProducerConfig(cafeKafkaSettings);
                 
-                Console.WriteLine("Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
+                Console.WriteLine(DateTime.Now + " - Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
             }
             catch (Exception ex)
             {
@@ -37,9 +37,9 @@ namespace dotnet.cafe.counter.services
                 var database = client.GetDatabase(cafeDatabaseSettings.DatabaseName);
                 _orderRepository = database.GetCollection<Order>(cafeDatabaseSettings.OrdersCollectionName);
                 
-                Console.WriteLine("Read MongoDB Connection String: " + cafeDatabaseSettings.ConnectionString);
-                Console.WriteLine("Read MongoDB DB Name: " + cafeDatabaseSettings.DatabaseName);
-                Console.WriteLine("Read MongoDB Collection Name: " + cafeDatabaseSettings.OrdersCollectionName);
+                Console.WriteLine(DateTime.Now + " - Read MongoDB Connection String: " + cafeDatabaseSettings.ConnectionString);
+                Console.WriteLine(DateTime.Now + " - Read MongoDB DB Name: " + cafeDatabaseSettings.DatabaseName);
+                Console.WriteLine(DateTime.Now + " - Read MongoDB Collection Name: " + cafeDatabaseSettings.OrdersCollectionName);
             }
             catch (Exception ex)
             {
@@ -65,7 +65,7 @@ namespace dotnet.cafe.counter.services
             {
                 string topic = "web-in";
                 c.Subscribe(topic);
-                Console.WriteLine("Counter Service Listening to: " + topic);
+                Console.WriteLine(DateTime.Now + " - Counter Service Listening to: " + topic);
 
                 try
                 {
@@ -74,7 +74,7 @@ namespace dotnet.cafe.counter.services
                         try
                         {
                             var cr = c.Consume(cancellationToken);
-                            Console.WriteLine(topic + ":" + cr.Message.Value);
+                            Console.WriteLine(DateTime.Now + " - " + topic + ":" + cr.Message.Value);
                             CreateOrderCommand orderCommand = JsonUtil.createOrderCommandFromJson(cr.Message.Value);
                             handleCreateOrderCommand(orderCommand);
                         }
@@ -98,7 +98,7 @@ namespace dotnet.cafe.counter.services
             {
                 string topic = "orders-out";
                 c.Subscribe(topic);
-                Console.WriteLine("Counter Service Listening to: " + topic);
+                Console.WriteLine(DateTime.Now + " - Counter Service Listening to: " + topic);
                 try
                 {
                     while (!cancellationToken.IsCancellationRequested)
@@ -106,7 +106,7 @@ namespace dotnet.cafe.counter.services
                         try
                         {
                             var cr = c.Consume(cancellationToken);
-                            Console.WriteLine(topic + ":" + cr.Message.Value);
+                            Console.WriteLine(DateTime.Now + " - " + topic + ":" + cr.Message.Value);
                             sendWebUpdate(cr.Message.Value);
                             
                         }
@@ -132,7 +132,7 @@ namespace dotnet.cafe.counter.services
                     string itemString = JsonSerializer.Serialize(itemEvent);
                     var dr = await p.ProduceAsync("barista-in", new Message<Null, string> { Value = itemString });
                     sendWebUpdate(itemString);
-                    Console.WriteLine($"Sending Order to Barista '{dr.Value}' to '{dr.TopicPartitionOffset}'");
+                    Console.WriteLine(DateTime.Now + $" - Sending Order to Barista '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)
                 {
@@ -150,7 +150,7 @@ namespace dotnet.cafe.counter.services
                     
                     var dr = await p.ProduceAsync("kitchen-in", new Message<Null, string> { Value = itemString });
                     sendWebUpdate(itemString);
-                    Console.WriteLine($"Sending Order to Kitchen '{dr.Value}' to '{dr.TopicPartitionOffset}'");
+                    Console.WriteLine(DateTime.Now + $" - Sending Order to Kitchen '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)
                 {
@@ -165,7 +165,7 @@ namespace dotnet.cafe.counter.services
                 try
                 {
                     var dr = await p.ProduceAsync("web-updates-out", new Message<Null, string> { Value = itemString });
-                    Console.WriteLine($"Sending Order to Web '{dr.Value}' to '{dr.TopicPartitionOffset}'");
+                    Console.WriteLine(DateTime.Now + $" - Sending Order to Web '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)
                 {

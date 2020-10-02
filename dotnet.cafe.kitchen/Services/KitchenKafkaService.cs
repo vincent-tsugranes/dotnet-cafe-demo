@@ -25,7 +25,7 @@ namespace dotnet.cafe.kitchen.Services
 
                 _producerConfig = KafkaConfig.CreateProducerConfig(cafeKafkaSettings);
                 
-                Console.WriteLine("Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
+                Console.WriteLine(DateTime.Now + " - Read Kafka Bootstrap: " + cafeKafkaSettings.BootstrapServers);
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace dotnet.cafe.kitchen.Services
             {
                 string topicName = "kitchen-in";
                 c.Subscribe(topicName);
-                Console.WriteLine("Kitchen Service Listening to: " + topicName);
+                Console.WriteLine(DateTime.Now + " - Kitchen Service Listening to: " + topicName);
 
                 try
                 {
@@ -53,7 +53,7 @@ namespace dotnet.cafe.kitchen.Services
                         try
                         {
                             var cr = c.Consume(cancellationToken);
-                            Console.WriteLine($"Kitchen Service Received " + topicName + ":" + cr.Message.Value);
+                            Console.WriteLine(DateTime.Now + " - Kitchen Service Received " + topicName + ":" + cr.Message.Value);
                             HandleOrderIn(cr.Message.Value, cancellationToken);
                         }
                         catch (ConsumeException e)
@@ -76,7 +76,7 @@ namespace dotnet.cafe.kitchen.Services
 
             if (orderIn.eventType.Equals(EventType.KITCHEN_ORDER_IN))
             {
-                Console.WriteLine($"Kitchen Making Order " + message);
+                Console.WriteLine(DateTime.Now + " - Kitchen Making Order " + message);
                 
                 _kitchen.make(orderIn).ContinueWith(async kitchenOutput =>
                 {
@@ -98,7 +98,7 @@ namespace dotnet.cafe.kitchen.Services
                 try
                 {   
                     var dr = await p.ProduceAsync("orders-out", new Message<Null, string> { Value=json });
-                    Console.WriteLine($"Delivered '{dr.Value}' to '{dr.TopicPartitionOffset}'");
+                    Console.WriteLine(DateTime.Now + $" - Delivered '{dr.Value}' to '{dr.TopicPartitionOffset}'");
                 }
                 catch (ProduceException<Null, string> e)
                 {
