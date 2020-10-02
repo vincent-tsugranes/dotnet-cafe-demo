@@ -29,17 +29,9 @@ namespace dotnet.cafe.web.Controllers
 
             String kafkaBootstrap = Environment.GetEnvironmentVariable("DOTNET_CAFE_KAFKA_BOOTSTRAP") ?? "127.0.0.1:9099";
             var cafeKafkaSettings = new CafeKafkaSettings(kafkaBootstrap);
-            var consumerConfig = new ConsumerConfig()
-            {
-                GroupId = cafeKafkaSettings.GroupId,
-                BootstrapServers = cafeKafkaSettings.BootstrapServers,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                SocketKeepaliveEnable = true,
-                AllowAutoCreateTopics = true
-            };
-            
+            var consumerConfig = KafkaConfig.CreateConsumerConfig(cafeKafkaSettings);
 
-                Task.Run(() => { ConsumeKafka(consumerConfig, cancellationToken); });
+            Task.Run(() => { ConsumeKafka(consumerConfig, cancellationToken); });
                 
                 await response.Body.FlushAsync();
                 
