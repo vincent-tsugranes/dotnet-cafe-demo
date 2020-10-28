@@ -32,12 +32,6 @@
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            @*<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>*@
             <a class="navbar-brand active" href="#banner"><i class="fa fa-coffee"></i> Dotnet Coffee Shop</a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -49,6 +43,7 @@
                 @*<li><a href="#team">Team</a></li>
                 <li><a href="#testimonials">Twitter</a></li>*@
                 <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="modal" data-target="#rewardsModal">Rewards</a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -57,18 +52,46 @@
 </nav>
 
 <span id="banner"></span>
-    <section class="banner">
-        <div class="jumbotron">
-            <div class="container">
-                <div class="content">
-                    <h5>Established 2020</h5>
-                    <h1>Dotnet Coffee Shop</h1>
-                    <a href="#menu" class="btn">Place an Order</a>
-                </div>
+<section class="banner">
+    <div class="jumbotron">
+        <div class="container">
+            <div class="content">
+                <h5>Established 2020</h5>
+                <h1>Dotnet Coffee Shop</h1>
+                <a href="#menu" class="btn">Place an Order</a>
             </div>
         </div>
-    </section>
- <span class="anchor" id="about"></span>
+    </div>
+</section>
+
+<div class="modal" id="rewardsModal">
+             <div class="modal-dialog">
+                 <div class="modal-content">
+                     <!-- Modal Header -->
+                         <div class="modal-header">
+                             <h4 class="modal-title">
+                                 Rewards Info
+                             </h4>
+                             <button type="button" class="close" data-dismiss="modal">&times;</button>
+                         </div>
+                         <!-- Modal body -->
+                         <div class="modal-body flex-fill d-inline-flex">
+                         <div class="flex-fill d-inline-flex justify-content-end">
+                                     <label for="rewards_id" class="mr-sm-2 input-cafe text-nowrap mb-2">Rewards ID:</label>
+                                     <input type="text" class="form-control mb-2 mr-sm-2" placeholder="Enter rewards id" id="rewards_id" rewards_id="rewards_id">
+                                 </div>
+                         </div>
+
+                         <!-- Modal footer -->
+                         <div class="modal-footer">
+                             <div class="flex-fill">
+                                 <button type="button" id="rewards_entered" class="btn-sm btn-primary pull-right" data-dismiss="modal">Done</button>
+                             </div>
+                         </div>
+                 </div>
+             </div>
+         </div>
+<span class="anchor" id="about"></span>
  <section class="about">
      <div class="container padding-2x">
          <div class="row text-wrap">
@@ -106,7 +129,7 @@
              </div>
          </div>
          <div class="modal" id="myModal">
-             <div class="modal-dialog">
+             <div class="modal-dialog" display="flex">
                  <div class="modal-content">
                      <!-- Modal Header -->
                      <div class="modal-header">
@@ -123,6 +146,10 @@
                      </div>
                      <!-- Modal body -->
                      <div class="modal-body">
+                         <div id="rewards_display" class="small text-muted" style="align-self: flex-end">
+                             <text> Rewards member</text>
+                             <text id="rewards_display_id"></text>
+                         </div>
                          <form class="form-inline" action="" id="item_form">
                              <div class="flex-fill d-inline-flex justify-content-between">
                                  <input type="hidden" id="item_type" name="item_type"/>

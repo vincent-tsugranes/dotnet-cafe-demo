@@ -86,9 +86,12 @@ $(document).ready(function(){
         var y = $(this).scrollTop();
 
         $('nav a').each(function (event) {
-            if (y >= $($(this).attr('href')).offset().top - 75) {
-                $('nav a').not(this).removeClass('active');
-                $(this).addClass('active');
+            var element = $($(this).attr('href'));
+            if (element !== undefined && element.offset() !== undefined){
+                if (y >= element.offset().top - 75) {
+                    $('nav a').not(this).removeClass('active');
+                    $(this).addClass('active');
+                }   
             }
         });
 

@@ -332,3 +332,13 @@ function displayFriendlyStatus(status){
     }
     return result;
 }
+
+$('#rewards_entered').on('click', function() {
+    var rewards_id = $('#rewards_id').val();
+    console.log("rewards id entered: " + rewards_id);
+    $('#rewards_display_id').text(rewards_id);
+});
+
+$('#rewardsModal').on('shown.bs.modal', function() {
+    $('#rewards_id').focus();
+});
