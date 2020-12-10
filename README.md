@@ -34,6 +34,14 @@ create a mongodb ephemeral instance in the project. This sets the service name, 
       -p MONGODB_ADMIN_PASSWORD=redhat-20 \
       -p DATABASE_SERVICE_NAME=dotnet-cafe-mongodb-service
 
+
+*This will not work if you're on OpenShift 4.6+ because the mongodb-ephemeral template has been removed. It is included in this repo, and you can reinstall it by running:
+
+    oc create -f mongodb-ephemeral-template.json
+
+You can also get it from the source at: https://github.com/openshift/origin/blob/master/examples/db-templates/mongodb-ephemeral-template.json
+
+    
 # create kafka cluster
 *This requires that the "Red Hat Integration - AMQ Streams" operator be installed on the cluster. That operator will take the configuration from this yaml file, and deploy a 3-node kafka cluster.
 
