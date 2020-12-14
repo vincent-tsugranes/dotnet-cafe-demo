@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Prometheus;
 
 namespace dotnet.cafe.web
 {
@@ -62,6 +63,8 @@ namespace dotnet.cafe.web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
             
+            //enable prometheus metrics
+            app.UseMetricServer(url: "/metrics");
         }
     }
 }
